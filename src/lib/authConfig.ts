@@ -2,6 +2,7 @@ import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const authOptions: NextAuthConfig = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -11,9 +12,9 @@ const authOptions: NextAuthConfig = {
       },
       async authorize(credentials) {
         console.log(credentials);
-        const user = { id: 1, name: "admin", email: "admin@admin.com" };
+        const user = { id: "1", name: "admin", email: "admin@admin.com" };
         if (
-          credentials.email !== "email@email.com" &&
+          credentials.email !== "email@email.com" ||
           credentials.password !== "1234"
         ) {
           console.error("erro 124");
@@ -24,6 +25,9 @@ const authOptions: NextAuthConfig = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
 };
 
 export { authOptions };
