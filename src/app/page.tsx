@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
   const [stateEmail, setStateEmail] = useState("");
   const [statePassword, setStatePassWord] = useState("");
+
+  const router = useRouter();
 
   return (
     <main>
@@ -41,15 +44,17 @@ export default function Home() {
               />
               <Button
                 onClick={async () => {
-                  const userLogin = {
+                  const result = await signIn("credentials", {
                     email: stateEmail,
                     password: statePassword,
-                  };
-                  console.log(userLogin);
-                  await signIn("credentials", {
-                    email: stateEmail,
-                    password: statePassword,
+                    redirect: false,
                   });
+                  if (result.error) {
+                    alert("email ou senha inválidos");
+                    return;
+                  }
+                  alert("Seja bem vindo");
+                  router.push("/dashboard");
                 }}
               >
                 Entrar
