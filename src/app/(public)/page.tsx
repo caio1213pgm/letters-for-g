@@ -1,27 +1,13 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
 export default function Home() {
-  const [stateEmail, setStateEmail] = useState("");
-  const [statePassword, setStatePassWord] = useState("");
+  // const [stateEmail, setStateEmail] = useState("");
+  // const [statePassword, setStatePassWord] = useState("");
 
-  const router = useRouter();
+  // const router = useRouter();
 
   return (
     <main>
-      <div className="flex mx-auto max-w-3xl">
-        <Card className="w-full">
+      <div className="flex mx-auto my-auto max-w-3xl h-full">
+        {/* <Card className="w-full">
           <CardHeader>
             <CardTitle>Login</CardTitle>
             <CardDescription>
@@ -61,7 +47,8 @@ export default function Home() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
+        pagina inicial
       </div>
     </main>
   );
