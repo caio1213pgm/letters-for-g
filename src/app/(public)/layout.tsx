@@ -8,7 +8,7 @@ export default function PublicLayout({
   return (
     <>
       <MainHeader />
-      {children}
+      <div className="max-w-3xl h-full my-auto mx-auto">{children}</div>
     </>
   );
 }
