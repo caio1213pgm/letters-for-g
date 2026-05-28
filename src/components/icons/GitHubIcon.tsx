@@ -1,4 +1,4 @@
-import { typeIcon } from "@/app/types/typeIcon";
+import { typeIcon } from "@/types/typeIcon";
 
 export function GithubIcon({ size = 24, className }: typeIcon) {
   return (
