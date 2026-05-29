@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../ui/card";
+import FooterAuthForms from "../footerAuthForms";
 import ButtonsLogin from "./buttonsLogin";
 import InputCredentialsLogin from "./inputCredentialsLogin";
 
@@ -26,9 +27,7 @@ export default function FormLogin() {
           </div>
         </CardContent>
         <CardFooter>
-          <p className="mx-auto text-muted-foreground hover:text-foreground hover:cursor-pointer transition-all duration-200">
-            Crie sua conta
-          </p>
+          <FooterAuthForms label="Crie sua conta" path="/register" />
         </CardFooter>
       </Card>
     </div>
