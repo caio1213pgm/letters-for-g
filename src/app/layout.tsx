@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Instrument_Sans } from "next/font/google";
-import "./globals.css";
 import { cn } from "@/lib/utils";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono, Instrument_Sans, Inter } from "next/font/google";
+import "./globals.css";
 
 const instrumentSansHeading = Instrument_Sans({
   subsets: ["latin"],
@@ -34,7 +34,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(
-        "h-full",
+        "h-full dark",
         "antialiased",
         geistSans.variable,
         geistMono.variable,
