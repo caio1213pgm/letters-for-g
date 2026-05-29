@@ -36,6 +36,7 @@ export default function InputCredentialsLogin() {
       <Input
         label="Senha"
         placeholder="Digite sua senha"
+        type="password"
         {...register("password")}
       />
       {errors.password && (
