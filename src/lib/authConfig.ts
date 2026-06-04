@@ -1,5 +1,7 @@
+import bcrypt from "bcryptjs";
 import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { prisma } from "./prisma";
 
 const authOptions: NextAuthConfig = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -11,22 +13,45 @@ const authOptions: NextAuthConfig = {
         password: { label: "password", type: "text" },
       },
       async authorize(credentials) {
-        console.log(credentials);
-        const user = { id: "1", name: "admin", email: "admin@admin.com" };
-        if (
-          credentials.email !== "email@email.com" ||
-          credentials.password !== "1234"
-        ) {
-          console.error("erro 124");
-          return null;
-        }
-        console.log(user);
-        return user;
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string },
+          include: { credential: true },
+        });
+
+        if (!user?.credential) return null;
+
+        const isValidPassword = await bcrypt.compare(
+          credentials.password as string,
+          user.credential.passwordHash,
+        );
+
+        if (!isValidPassword) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        };
       },
     }),
   ],
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+
+    session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
 };
 
