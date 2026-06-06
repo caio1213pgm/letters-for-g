@@ -1,4 +1,5 @@
-import MainHeader from "@/components/layout/header";
+import Footer from "@/components/layout/PublicFooter";
+import Header from "@/components/layout/PublicHeader";
 
 export default function PublicLayout({
   children,
@@ -7,8 +8,9 @@ export default function PublicLayout({
 }>) {
   return (
     <>
-      <MainHeader />
-      <div className="max-w-3xl h-full my-auto mx-auto">{children}</div>
+      <Header />
+      <div className="h-full">{children}</div>
+      <Footer />
     </>
   );
 }
