@@ -12,8 +12,22 @@ import InputCredentialsLogin from "./inputCredentialsLogin";
 
 export default function FormLogin() {
   return (
-    <div>
-      <Card className="w-xs sm:w-md py-5">
+    <div className="overflow-x-hidden">
+      <div
+        className="absolute left-1/3 top-1 h-130 w-100 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, var(--color-chart-1), transparent 50%)",
+        }}
+      />
+      <div
+        className="overflow-x-hidden absolute right-1/8 bottom-3 h-130 w-100 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, var(--color-chart-1), transparent 50%)",
+        }}
+      />
+      <Card className="w-xs sm:w-md py-5 border">
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>
