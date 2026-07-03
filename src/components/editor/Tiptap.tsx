@@ -8,11 +8,17 @@ import EditorControls from "./editorControls";
 
 const Tiptap = () => {
   const editor = useEditor({
-    extensions: [StarterKit, Heading, TextStyleKit],
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+      }),
+      Heading.configure({ levels: [1, 2] }),
+      TextStyleKit,
+    ],
     content: `
-    <h2>Bem vindo ao LFG!</h2>
-    <p>Comece escrevendo o que vem em mente.</p>
-    <p>Adicione estilizações para expressar sentimentos através de suas palavras</p>
+    <h1>Bem vindo ao LFG!</h1>
+    <p>Comece escrevendo o que vem em <s>mente</s> <strong><u>coração</u></strong>.</p>
+    <p>Adicione <em>estilizações para expressar</em> <strong>sentimentos</strong> através de suas palavras</p>
     `,
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
