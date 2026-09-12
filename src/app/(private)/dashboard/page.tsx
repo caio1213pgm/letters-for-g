@@ -1,9 +1,9 @@
-import TesteLogOff from "@/components/teste";
+import BoxLetters from "@/components/BoxLetters";
 
-export default function DashBoardPage() {
+export default function DashboardPage() {
   return (
     <div className="mx-auto">
-      <TesteLogOff />
+      <BoxLetters />
     </div>
   );
 }
