@@ -14,14 +14,14 @@ export default function FormLogin() {
   return (
     <div className="overflow-x-hidden">
       <div
-        className="absolute left-1/3 top-1 h-130 w-100 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
+        className="pointer-events-none absolute left-1/3 top-1 h-130 w-100 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
         style={{
           background:
             "radial-gradient(circle, var(--color-chart-1), transparent 50%)",
         }}
       />
       <div
-        className="overflow-x-hidden absolute right-1/8 bottom-3 h-130 w-100 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
+        className="overflow-x-hidden pointer-events-none absolute right-1/8 bottom-3 h-130 w-100 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
         style={{
           background:
             "radial-gradient(circle, var(--color-chart-1), transparent 50%)",
