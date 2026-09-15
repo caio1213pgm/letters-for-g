@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/components/context/AuthContext";
 import PrivateHeader from "@/components/layout/PrivateHeader";
 import { SessionProvider } from "next-auth/react";
 
@@ -9,8 +10,10 @@ export default function PrivateLayout({
   return (
     <>
       <SessionProvider>
-        <PrivateHeader />
-        <div className="max-w-3xl h-full my-auto mx-auto">{children}</div>
+        <AuthProvider>
+          <PrivateHeader />
+          <div className="max-w-3xl h-full my-auto mx-auto">{children}</div>
+        </AuthProvider>
       </SessionProvider>
     </>
   );
