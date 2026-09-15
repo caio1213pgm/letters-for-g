@@ -1,28 +1,26 @@
+"use server";
 import { prisma } from "@/lib/prisma";
+import dayjs from "dayjs";
+
 import { letterCardType } from "@/types/letterCardType";
 
-export function getLetters(): letterCardType[] {
-  const letter: letterCardType = {
-    author: "Caio Fabio",
-    lastEdit: "10/10/2026",
-    resume: "Resumo de uma carta de amor para uma pessoa amada",
-    title: "Uma carta de amor",
-    id: 0,
-  };
-  const lettersArr = [];
-  for (let index = 0; index < 4; index++) {
-    const element = {
-      ...letter,
+type getLettersProps = {
+  authorId: string;
+};
+
+export async function getLetters({ authorId }: getLettersProps) {
+  const letters = await prisma.letter.findMany({
+    where: { authorId },
+  });
+
+  const mappedLetters: letterCardType[] = letters.map((item, index) => {
+    return {
+      author: item.authorName,
       id: index,
+      lastEdit: dayjs(item.createdAt).format("DD/MM/YYYY"),
+      resume: item.text,
+      title: item.title,
     };
-    lettersArr.push(element);
-  }
-
-  return lettersArr;
-}
-
-export async function getCartas() {
-  const authorId = "cmtusw7ce00002oxf7oif6qmq";
-  const letters = await prisma.letter.findMany({ where: { authorId } });
-  console.log(letters);
+  });
+  return mappedLetters;
 }
