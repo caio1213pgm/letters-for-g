@@ -26,12 +26,9 @@ const authOptions: NextAuthConfig = {
         );
 
         if (!isValidPassword) return null;
+        console.log(user);
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
+        return user;
       },
     }),
   ],

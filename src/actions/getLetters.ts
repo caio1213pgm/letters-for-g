@@ -1,6 +1,7 @@
+import { prisma } from "@/lib/prisma";
 import { letterCardType } from "@/types/letterCardType";
 
-export default function getLetters(): letterCardType[] {
+export function getLetters(): letterCardType[] {
   const letter: letterCardType = {
     author: "Caio Fabio",
     lastEdit: "10/10/2026",
@@ -18,4 +19,10 @@ export default function getLetters(): letterCardType[] {
   }
 
   return lettersArr;
+}
+
+export async function getCartas() {
+  const authorId = "cmtusw7ce00002oxf7oif6qmq";
+  const letters = await prisma.letter.findMany({ where: { authorId } });
+  console.log(letters);
 }

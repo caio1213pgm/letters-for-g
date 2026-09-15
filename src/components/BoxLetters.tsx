@@ -1,8 +1,10 @@
-import getLetters from "@/actions/getLetters";
+import { getCartas, getLetters } from "@/actions/getLetters";
 import LetterCard from "./ui/letterCard";
 
-export default function BoxLetters() {
-  const lettersData = getLetters();
+export default async function BoxLetters() {
+  const lettersData = await getLetters();
+
+  const letters = await getCartas();
 
   return (
     <div className="flex flex-col items-center">

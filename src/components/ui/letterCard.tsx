@@ -1,4 +1,3 @@
-"use client";
 import { letterCardType } from "@/types/letterCardType";
 
 type letterCardProps = {
