@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: data.user.name!,
       }
     : null;
-  console.log(user);
   return (
     <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
   );

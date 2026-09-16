@@ -1,18 +1,22 @@
-import { getCartas, getLetters } from "@/actions/getLetters";
+import { getLetters } from "@/actions/getLetters";
+import EmptyLetter from "./Letters/emptyLetter";
 import LetterCard from "./ui/letterCard";
 
-export default async function BoxLetters() {
-  const lettersData = await getLetters();
+type BoxLettersProps = {
+  authorId: string;
+};
 
-  const letters = await getCartas();
+export default async function BoxLetters({ authorId }: BoxLettersProps) {
+  const lettersData = await getLetters({ authorId });
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <h1>MOSTRAR CARTAS</h1>
-      <div className="grid grid-cols-2 gap-4 border shadow-xl rounded-xl p-5">
+      <div className="grid grid-cols-3 gap-4 border shadow-xl rounded-xl p-6 w-250">
         {lettersData.map((item) => (
           <LetterCard letter={item} key={item.id} />
         ))}
+        <EmptyLetter />
       </div>
     </div>
   );
