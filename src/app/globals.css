@@ -127,6 +127,19 @@
   @apply text-[1.3rem] font-semibold;
 }
 
+@keyframes spin-360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.group:hover .group-hover\:spin-360 {
+  animation: spin-360 0.6s ease-in-out;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
