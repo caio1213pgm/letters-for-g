@@ -2,13 +2,17 @@
 import { prisma } from "@/lib/prisma";
 import dayjs from "dayjs";
 
+import { auth } from "@/auth";
 import { letterCardType } from "@/types/letterCardType";
 
 type getLettersProps = {
   authorId: string;
 };
 
-export async function getLetters({ authorId }: getLettersProps) {
+export async function getLetters() {
+  const { user } = await auth();
+  const authorId = user.id;
+  console.log(user);
   const letters = await prisma.letter.findMany({
     where: { authorId },
   });

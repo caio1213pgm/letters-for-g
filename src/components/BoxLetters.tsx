@@ -6,8 +6,8 @@ type BoxLettersProps = {
   authorId: string;
 };
 
-export default async function BoxLetters({ authorId }: BoxLettersProps) {
-  const lettersData = await getLetters({ authorId });
+export default async function BoxLetters() {
+  const lettersData = await getLetters();
 
   return (
     <div className="flex flex-col items-center w-full">
