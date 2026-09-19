@@ -4,15 +4,16 @@ import dayjs from "dayjs";
 
 import { auth } from "@/auth";
 import { letterCardType } from "@/types/letterCardType";
-
-type getLettersProps = {
-  authorId: string;
-};
+import { redirect } from "next/navigation";
 
 export async function getLetters() {
-  const { user } = await auth();
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const user = session.user;
   const authorId = user.id;
-  console.log(user);
   const letters = await prisma.letter.findMany({
     where: { authorId },
   });
