@@ -26,9 +26,12 @@ const Tiptap = () => {
   });
 
   return (
-    <div className="flex flex-col min-h-56 gap-4 w-xs sm:w-xl">
+    <div className="flex w-full flex-col gap-4">
       <EditorControls editor={editor} />
-      <EditorContent editor={editor} className="h-full" />
+      <EditorContent
+        editor={editor}
+        className="w-full rounded-2xl border border-border bg-background px-6 py-5 transition-colors focus-within:border-primary/40 [&_.tiptap]:min-h-56 [&_.tiptap]:outline-none"
+      />
     </div>
   );
 };
