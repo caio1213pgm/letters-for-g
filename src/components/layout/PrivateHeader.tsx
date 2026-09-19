@@ -1,4 +1,5 @@
 import { Mail, UserRound } from "lucide-react";
+import Link from "next/link";
 
 export default function PrivateHeader() {
   return (
@@ -15,9 +16,11 @@ export default function PrivateHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="hover:underline hover:text-accent-foreground cursor-pointer transition-all duration-200">
-            Minhas Cartas
-          </span>
+          <Link href={"/dashboard"}>
+            <span className="hover:underline hover:text-accent-foreground cursor-pointer transition-all duration-200">
+              Minhas Cartas
+            </span>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 border-2 p-2 rounded-full cursor-pointer">
