@@ -1,12 +1,24 @@
 "use client";
 
 import Heading from "@tiptap/extension-heading";
+import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useEffect } from "react";
 import EditorControls from "./editorControls";
 
-const Tiptap = () => {
+type TiptapProps = {
+  value: string;
+  onChange: (content: string) => void;
+  placeholder?: string;
+};
+
+const Tiptap = ({
+  value,
+  onChange,
+  placeholder = "Comece a escrever sua carta...",
+}: TiptapProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -14,24 +26,33 @@ const Tiptap = () => {
       }),
       Heading.configure({ levels: [1, 2] }),
       TextStyleKit,
+      Placeholder.configure({
+        placeholder,
+      }),
     ],
-    content: `
-    <h1>Bem vindo ao LFG!</h1>
-    <p>Comece escrevendo o que vem em <s>mente</s> <strong><u>coração</u></strong>.</p>
-    <p>Adicione <em>estilizações para expressar</em> <strong>sentimentos</strong> através de suas palavras</p>
-    `,
-    // Don't render immediately on the server to avoid SSR issues
+    content: value,
     immediatelyRender: false,
     autofocus: true,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
   });
+
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value);
+    }
+  }, [value, editor]);
 
   return (
     <div className="flex w-full flex-col gap-4">
       <EditorControls editor={editor} />
-      <EditorContent
-        editor={editor}
-        className="w-full rounded-2xl border border-border bg-background px-6 py-5 transition-colors focus-within:border-primary/40 [&_.tiptap]:min-h-56 [&_.tiptap]:outline-none"
-      />
+      <div className="w-full max-w-full overflow-hidden rounded-2xl border border-border bg-background transition-colors focus-within:border-primary/40">
+        <EditorContent
+          editor={editor}
+          className="w-full px-6 py-5 [&_.tiptap]:min-h-56 [&_.tiptap]:max-h-96 [&_.tiptap]:w-full [&_.tiptap]:overflow-y-auto [&_.tiptap]:outline-none"
+        />
+      </div>
     </div>
   );
 };

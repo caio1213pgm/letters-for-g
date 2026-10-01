@@ -6,7 +6,11 @@ import { auth } from "@/auth";
 import { letterCardType } from "@/types/letterCardType";
 import { redirect } from "next/navigation";
 
-export async function getLetters() {
+type getLettersProps = {
+  letterSlug?: string;
+};
+
+export async function getLetters({ letterSlug }: getLettersProps) {
   const session = await auth();
   if (!session?.user) {
     redirect("/login");
@@ -14,6 +18,12 @@ export async function getLetters() {
 
   const user = session.user;
   const authorId = user.id;
+  if (letterSlug) {
+    const uniqueLetter = await prisma.letter.findUnique({
+      where: { id: letterSlug },
+    });
+    console.log(uniqueLetter);
+  }
   const letters = await prisma.letter.findMany({
     where: { authorId },
   });

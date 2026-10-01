@@ -1,21 +1,33 @@
 "use server";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
-type createLetterProps = {
-  authorId: string;
+type CreateLetterProps = {
+  text: string;
+  title: string;
 };
 
-export async function createLetter() {
-  console.log("chegou");
+export async function createLetter({ text, title }: CreateLetterProps) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const user = session.user;
+  const slug = title.toLowerCase().replace(/\s+/g, "-");
+
   const newLetter = {
-    authorId: "cmtusw7ce00002oxf7oif6qmq",
-    text: "minha primeira carta teste com texto",
-    title: "carta 123",
-    slug: "carta_abc",
+    authorId: user.id || "",
+    authorName: user.name || "",
+    text,
+    title,
+    slug,
   };
+
   const letter = await prisma.letter.create({
     data: newLetter,
   });
 
-  console.log(letter);
+  return letter;
 }

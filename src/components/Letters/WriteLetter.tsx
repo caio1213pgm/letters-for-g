@@ -1,16 +1,57 @@
 "use client";
 
+import { createLetter } from "@/actions/createLetter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PenLine } from "lucide-react";
+import { PenLine, Send } from "lucide-react";
 import { useState } from "react";
 import Tiptap from "../editor/Tiptap";
 
 export default function WriteLetter() {
   const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleCreateLetter = async () => {
+    setError(null);
+    setSuccess(false);
+
+    if (!title.trim()) {
+      setError("Por favor, adicione um título para sua carta");
+      return;
+    }
+
+    if (!content.trim()) {
+      setError("Por favor, escreva algo em sua carta");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await createLetter({
+        title: title.trim(),
+        text: content,
+      });
+      setSuccess(true);
+      setTitle("");
+      setContent("");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erro ao criar a carta. Tente novamente."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="w-full py-10 md:py-14">
-      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 px-4">
+      <div className="mx-auto flex min-w-2xl md:max-w-2xl flex-col items-center gap-8 px-4">
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <PenLine className="h-3 w-3 text-primary" />
@@ -35,7 +76,34 @@ export default function WriteLetter() {
           />
 
           <div className="mt-8">
-            <Tiptap />
+            <Tiptap
+              value={content}
+              onChange={setContent}
+              placeholder="Comece a escrever sua carta..."
+            />
+          </div>
+
+          <div className="mt-8 flex flex-col gap-4">
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="rounded-lg border border-green-500/50 bg-green-50 px-4 py-3 text-sm text-green-700">
+                ✓ Carta criada com sucesso!
+              </div>
+            )}
+
+            <Button
+              onClick={handleCreateLetter}
+              disabled={isLoading}
+              className="w-full gap-2 md:w-auto"
+            >
+              <Send className="h-4 w-4" />
+              {isLoading ? "Salvando..." : "Criar Carta"}
+            </Button>
           </div>
         </div>
       </div>
