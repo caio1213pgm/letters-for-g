@@ -83,7 +83,7 @@ model Letter {
   id         String       @id @default(cuid())
   title      String
   text       String
-  slug       String
+  slug       String       @unique
   status     LetterStatus @default(SKETCH)
   createdAt  DateTime     @default(now())
   readers    Int          @default(0)

@@ -6,7 +6,11 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import EditorControls from "./editorControls";
 
-const Tiptap = () => {
+type TiptapProps = {
+  content?: string;
+};
+
+const Tiptap = ({ content }: TiptapProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -15,11 +19,7 @@ const Tiptap = () => {
       Heading.configure({ levels: [1, 2] }),
       TextStyleKit,
     ],
-    content: `
-    <h1>Bem vindo ao LFG!</h1>
-    <p>Comece escrevendo o que vem em <s>mente</s> <strong><u>coração</u></strong>.</p>
-    <p>Adicione <em>estilizações para expressar</em> <strong>sentimentos</strong> através de suas palavras</p>
-    `,
+    content: content || "",
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     autofocus: true,

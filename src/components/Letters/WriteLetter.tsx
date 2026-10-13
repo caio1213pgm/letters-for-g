@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Input } from "@/components/ui/input";
@@ -5,8 +6,14 @@ import { PenLine } from "lucide-react";
 import { useState } from "react";
 import Tiptap from "../editor/Tiptap";
 
-export default function WriteLetter() {
-  const [title, setTitle] = useState("");
+type WriteLetterProps = {
+  letterData?: any;
+};
+
+export default function WriteLetter({ letterData }: WriteLetterProps) {
+  const [title, setTitle] = useState(letterData ? letterData.title : "");
+
+  console.log(letterData);
 
   return (
     <section className="w-full py-10 md:py-14">
@@ -35,7 +42,7 @@ export default function WriteLetter() {
           />
 
           <div className="mt-8">
-            <Tiptap />
+            <Tiptap content={letterData?.text || ""} />
           </div>
         </div>
       </div>

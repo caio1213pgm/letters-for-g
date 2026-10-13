@@ -25,6 +25,7 @@ export async function getLetters() {
       lastEdit: dayjs(item.createdAt).format("DD/MM/YYYY"),
       resume: item.text,
       title: item.title,
+      slug: item.slug,
     };
   });
   return mappedLetters;
