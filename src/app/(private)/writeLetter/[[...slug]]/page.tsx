@@ -5,11 +5,11 @@ import { letterCardType } from "@/types/letterCardType";
 export default async function WriteLetterPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const urlParams = await params;
 
-  const letterData = await getLetterById(urlParams.id);
+  const letterData = await getLetterById(urlParams.slug);
   if (!letterData) {
     return (
       <div>

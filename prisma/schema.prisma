@@ -90,4 +90,5 @@ model Letter {
   authorId   String
   authorName String       @default("")
   author     User         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  @@unique([authorId, slug])
 }
