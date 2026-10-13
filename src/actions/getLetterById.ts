@@ -13,6 +13,5 @@ export async function getLetterById(letterId: string) {
     where: { slug: letterId },
   });
 
-  console.log("uniqueLetter", uniqueLetter);
   return uniqueLetter as letterCardType | null;
 }

@@ -15,8 +15,6 @@ type WriteLetterProps = {
 export default function WriteLetter({ letterData }: WriteLetterProps) {
   const [title, setTitle] = useState(letterData ? letterData.title : "");
 
-  console.log(letterData);
-
   return (
     <section className="w-full py-10 md:py-14">
       <div className="mx-auto flex min-w-2xl md:max-w-2xl flex-col items-center gap-8 px-4">
