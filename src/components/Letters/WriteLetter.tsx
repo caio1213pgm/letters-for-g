@@ -5,7 +5,8 @@ import { createLetter } from "@/actions/createLetter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PenLine, Send } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import Tiptap from "../editor/Tiptap";
 
 type WriteLetterProps = {
@@ -14,11 +15,25 @@ type WriteLetterProps = {
 
 export default function WriteLetter({ letterData }: WriteLetterProps) {
   const [title, setTitle] = useState(letterData ? letterData.title : "");
+  const [text, setText] = useState<string>(letterData?.text || "");
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const canSubmit = title.trim() !== "" && text.replace(/<[^>]*>/g, "").trim() !== "";
+
+  const handleCreate = () => {
+    if (letterData) return;
+
+    startTransition(async () => {
+      await createLetter({ title: title.trim(), text });
+      router.push("/dashboard");
+    });
+  };
 
   return (
-    <section className="w-full py-10 md:py-14">
-      <div className="mx-auto flex min-w-2xl md:max-w-2xl flex-col items-center gap-8 px-4">
-        <div className="flex flex-col items-center gap-3 text-center">
+    <section className="w-full py-4 md:py-6">
+      <div className="mx-auto flex min-w-2xl md:max-w-2xl flex-col items-center gap-5 px-4">
+        <div className="flex flex-col items-center gap-2 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <PenLine className="h-3 w-3 text-primary" />
             Nova carta
@@ -32,7 +47,7 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
           </p>
         </div>
 
-        <div className="w-full rounded-3xl border border-border bg-card p-6 shadow-xl shadow-primary/5 md:p-10">
+        <div className="w-full rounded-3xl border border-border bg-card p-5 shadow-xl shadow-primary/5 md:p-6">
           <Input
             label="Título"
             placeholder="Dê um título para sua carta"
@@ -41,8 +56,15 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
             className="h-auto rounded-none border-0 border-b border-dashed border-border bg-transparent px-0 pb-4 font-heading text-2xl text-foreground shadow-none focus-visible:border-primary focus-visible:ring-0 md:text-3xl"
           />
 
-          <div className="mt-8">
-            <Tiptap content={letterData?.text || ""} />
+          <div className="mt-5">
+            <Tiptap content={letterData?.text || ""} onChange={setText} />
+          </div>
+
+          <div className="mt-4 flex justify-end">
+            <Button onClick={handleCreate} disabled={!canSubmit || isPending}>
+              <Send />
+              {isPending ? "Criando..." : "Criar carta"}
+            </Button>
           </div>
         </div>
       </div>

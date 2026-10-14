@@ -1,6 +1,7 @@
 "use server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { generateSlug } from "@/utils/generateSlug";
 import { redirect } from "next/navigation";
 
 type CreateLetterProps = {
@@ -15,7 +16,7 @@ export async function createLetter({ text, title }: CreateLetterProps) {
   }
 
   const user = session.user;
-  const slug = title.toLowerCase().replace(/\s+/g, "-");
+  const slug = generateSlug(title);
 
   const newLetter = {
     authorId: user.id || "",
