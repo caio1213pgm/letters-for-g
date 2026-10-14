@@ -8,9 +8,10 @@ import EditorControls from "./editorControls";
 
 type TiptapProps = {
   content?: string;
+  onChange?: (html: string) => void;
 };
 
-const Tiptap = ({ content }: TiptapProps) => {
+const Tiptap = ({ content, onChange }: TiptapProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -23,6 +24,7 @@ const Tiptap = ({ content }: TiptapProps) => {
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     autofocus: true,
+    onUpdate: ({ editor }) => onChange?.(editor.getHTML()),
   });
 
   return (
