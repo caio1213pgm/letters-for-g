@@ -1,4 +1,5 @@
 import { letterCardType } from "@/types/letterCardType";
+import { stripHtml } from "@/utils/stripHtml";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 
@@ -19,7 +20,7 @@ export default function LetterCard({ letter }: letterCardProps) {
           </h2>
         </div>
         <p className="mt-4 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-          {letter.resume}
+          {stripHtml(letter.resume)}
         </p>
         <div className="mt-4 flex items-center justify-between border-t border-dashed border-border pt-4 text-xs text-muted-foreground">
           <span>{letter.lastEdit}</span>
