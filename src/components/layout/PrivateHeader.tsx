@@ -1,5 +1,6 @@
 import { Mail, UserRound } from "lucide-react";
 import Link from "next/link";
+import UserProfile from "../ui/userProfile";
 
 export default function PrivateHeader() {
   return (
@@ -23,9 +24,7 @@ export default function PrivateHeader() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 border-2 p-2 rounded-full cursor-pointer">
-          <UserRound />
-        </div>
+        <UserProfile />
       </div>
     </header>
   );
