@@ -9,10 +9,15 @@ const publicRoutes = [
   { path: "/", isAuth: "next" },
 ] as const;
 
+// Rotas dinâmicas públicas, comparadas pelo início do caminho
+const publicPrefixRoutes = [{ path: "/letter/", isAuth: "next" }] as const;
+
 export async function proxy(request: NextRequest) {
   const secret = process.env.NEXTAUTH_SECRET;
   const path = request.nextUrl.pathname;
-  const publicRoute = publicRoutes.find((route) => route.path === path);
+  const publicRoute =
+    publicRoutes.find((route) => route.path === path) ??
+    publicPrefixRoutes.find((route) => path.startsWith(route.path));
   const token = await getToken({ req: request, secret });
 
   if (!token && publicRoute) {
