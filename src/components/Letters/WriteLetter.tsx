@@ -19,17 +19,36 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
   const [title, setTitle] = useState(letterData ? letterData.title : "");
   const [text, setText] = useState<string>(letterData?.text || "");
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [letterLink, setLetterLink] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const canSubmit = title.trim() !== "" && text.replace(/<[^>]*>/g, "").trim() !== "";
 
+  const copyLink = async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+    } catch {
+      // Alguns navegadores bloqueiam a cópia fora do clique; o link fica visível no modal
+      setLinkCopied(false);
+    }
+  };
+
   const handleCreate = ({ password, passwordHint }: LetterPasswordSchemaType) => {
     if (letterData) return;
 
     startTransition(async () => {
-      await createLetter({ title: title.trim(), text, password, passwordHint });
-      router.push("/dashboard");
+      const { slug } = await createLetter({
+        title: title.trim(),
+        text,
+        password,
+        passwordHint,
+      });
+      const link = `${window.location.origin}/letter/${slug}`;
+      setLetterLink(link);
+      await copyLink(link);
     });
   };
 
@@ -80,6 +99,10 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
         onOpenChange={setIsPasswordOpen}
         onConfirm={handleCreate}
         isPending={isPending}
+        letterLink={letterLink}
+        linkCopied={linkCopied}
+        onCopyLink={() => letterLink && copyLink(letterLink)}
+        onFinish={() => router.push("/dashboard")}
       />
     </section>
   );

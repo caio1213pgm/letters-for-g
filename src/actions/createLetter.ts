@@ -41,6 +41,7 @@ export async function createLetter({
 
   const letter = await prisma.letter.create({
     data: newLetter,
+    select: { slug: true },
   });
 
   return letter;
