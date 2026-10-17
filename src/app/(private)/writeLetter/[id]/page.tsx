@@ -24,5 +24,21 @@ export default async function WriteLetterByIdPage({
     );
   }
 
+  if (letter.status === "READ") {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-4 border border-border bg-card p-6 text-center shadow-xl shadow-primary/5 rounded-2xl">
+        <div className="text-center text-lg text-muted-foreground">
+          Esta carta já foi lida e não pode mais ser editada.
+        </div>
+        <Link
+          href={`/letter/${letter.slug}`}
+          className="text-blue-500 hover:underline"
+        >
+          Ver carta
+        </Link>
+      </div>
+    );
+  }
+
   return <WriteLetter letterData={letter} />;
 }
