@@ -4,10 +4,12 @@
 import { createLetter } from "@/actions/createLetter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LetterPasswordSchemaType } from "@/types/letterPasswordType";
 import { PenLine, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Tiptap from "../editor/Tiptap";
+import LetterPasswordModal from "./LetterPasswordModal";
 
 type WriteLetterProps = {
   letterData?: any;
@@ -16,16 +18,17 @@ type WriteLetterProps = {
 export default function WriteLetter({ letterData }: WriteLetterProps) {
   const [title, setTitle] = useState(letterData ? letterData.title : "");
   const [text, setText] = useState<string>(letterData?.text || "");
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const canSubmit = title.trim() !== "" && text.replace(/<[^>]*>/g, "").trim() !== "";
 
-  const handleCreate = () => {
+  const handleCreate = ({ password, passwordHint }: LetterPasswordSchemaType) => {
     if (letterData) return;
 
     startTransition(async () => {
-      await createLetter({ title: title.trim(), text });
+      await createLetter({ title: title.trim(), text, password, passwordHint });
       router.push("/dashboard");
     });
   };
@@ -61,13 +64,23 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
           </div>
 
           <div className="mt-4 flex justify-end">
-            <Button onClick={handleCreate} disabled={!canSubmit || isPending}>
+            <Button
+              onClick={() => !letterData && setIsPasswordOpen(true)}
+              disabled={!canSubmit || isPending}
+            >
               <Send />
               {isPending ? "Criando..." : "Criar carta"}
             </Button>
           </div>
         </div>
       </div>
+
+      <LetterPasswordModal
+        open={isPasswordOpen}
+        onOpenChange={setIsPasswordOpen}
+        onConfirm={handleCreate}
+        isPending={isPending}
+      />
     </section>
   );
 }

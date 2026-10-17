@@ -80,15 +80,18 @@ model Credential {
 }
 
 model Letter {
-  id         String       @id @default(cuid())
-  title      String
-  text       String
-  slug       String       @unique
-  status     LetterStatus @default(SKETCH)
-  createdAt  DateTime     @default(now())
-  readers    Int          @default(0)
-  authorId   String
-  authorName String       @default("")
-  author     User         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  id             String       @id @default(cuid())
+  title          String
+  text           String
+  slug           String       @unique
+  status         LetterStatus @default(SKETCH)
+  createdAt      DateTime     @default(now())
+  readers        Int          @default(0)
+  authorId       String
+  passwordLetter String       @default("")
+  passwordHint   String       @default("")
+  authorName     String       @default("")
+  author         User         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
   @@unique([authorId, slug])
 }
