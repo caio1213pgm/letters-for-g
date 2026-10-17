@@ -1,10 +1,8 @@
 "use client";
 
-import Heading from "@tiptap/extension-heading";
-import { TextStyleKit } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import EditorControls from "./editorControls";
+import { letterExtensions } from "./letterExtensions";
 
 type TiptapProps = {
   content?: string;
@@ -13,13 +11,7 @@ type TiptapProps = {
 
 const Tiptap = ({ content, onChange }: TiptapProps) => {
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: false,
-      }),
-      Heading.configure({ levels: [1, 2] }),
-      TextStyleKit,
-    ],
+    extensions: letterExtensions,
     content: content || "",
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
