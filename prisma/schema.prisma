@@ -91,7 +91,22 @@ model Letter {
   passwordLetter String       @default("")
   passwordHint   String       @default("")
   authorName     String       @default("")
+  readerName     String       @default("")
   author         User         @relation(fields: [authorId], references: [id], onDelete: Restrict)
 
+  unlockAttempts LetterUnlockAttempt[]
+
   @@unique([authorId, slug])
+}
+
+model LetterUnlockAttempt {
+  id          String   @id @default(cuid())
+  letterId    String
+  ip          String
+  attempts    Int      @default(0)
+  windowStart DateTime @default(now())
+
+  letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
+
+  @@unique([letterId, ip])
 }
