@@ -1,4 +1,4 @@
-import { Mail, UserRound } from "lucide-react";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 import UserProfile from "../ui/userProfile";
 
