@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuDefault,
 } from "@/components/ui/dropdown/dropdown-menu";
-import { Button } from "../button";
+import { Button } from "../buttons/button";
 import { EllipsisIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 

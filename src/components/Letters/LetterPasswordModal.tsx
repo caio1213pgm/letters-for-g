@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/buttons/button";
 import {
   Dialog,
   DialogClose,
@@ -62,7 +62,11 @@ export default function LetterPasswordModal({
       <DialogContent className="flex flex-col items-center gap-5 px-5 pt-8 pb-6 sm:px-7">
         <div className="grid size-18 place-items-center rounded-full border-[1.5px] border-dashed border-primary/45">
           <span className="grid size-13 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40">
-            {letterLink ? <Check className="size-5" /> : <Lock className="size-5" />}
+            {letterLink ? (
+              <Check className="size-5" />
+            ) : (
+              <Lock className="size-5" />
+            )}
           </span>
         </div>
 
@@ -109,8 +113,7 @@ export default function LetterPasswordModal({
                 Lacre sua carta
               </DialogTitle>
               <DialogDescription className="max-w-75 leading-relaxed">
-                Só quem souber a senha consegue abrir e ler o que você
-                escreveu.
+                Só quem souber a senha consegue abrir e ler o que você escreveu.
               </DialogDescription>
             </div>
 
@@ -150,8 +153,8 @@ export default function LetterPasswordModal({
                   </p>
                 ) : (
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    A dica aparece na tela de senha. Não coloque a própria
-                    senha aqui.
+                    A dica aparece na tela de senha. Não coloque a própria senha
+                    aqui.
                   </p>
                 )}
               </div>

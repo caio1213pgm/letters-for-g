@@ -2,7 +2,7 @@
 "use client";
 
 import { createLetter } from "@/actions/createLetter";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/buttons/button";
 import { Input } from "@/components/ui/input";
 import { LetterPasswordSchemaType } from "@/types/letterPasswordType";
 import { PenLine, Send } from "lucide-react";
@@ -24,7 +24,8 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const canSubmit = title.trim() !== "" && text.replace(/<[^>]*>/g, "").trim() !== "";
+  const canSubmit =
+    title.trim() !== "" && text.replace(/<[^>]*>/g, "").trim() !== "";
 
   const copyLink = async (link: string) => {
     try {
@@ -36,7 +37,10 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
     }
   };
 
-  const handleCreate = ({ password, passwordHint }: LetterPasswordSchemaType) => {
+  const handleCreate = ({
+    password,
+    passwordHint,
+  }: LetterPasswordSchemaType) => {
     if (letterData) return;
 
     startTransition(async () => {

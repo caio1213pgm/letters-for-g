@@ -10,7 +10,7 @@ import {
   Strikethrough,
   Underline,
 } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "../ui/buttons/button";
 
 type EditorControlsProps = {
   editor: Editor | null;

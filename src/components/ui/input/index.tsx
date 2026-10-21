@@ -1,7 +1,7 @@
 "use client";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../button";
+import { Button } from "../buttons/button";
 import { Label } from "../label";
 import { InputDefault } from "./input";
 

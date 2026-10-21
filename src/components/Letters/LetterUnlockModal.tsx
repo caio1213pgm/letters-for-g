@@ -1,7 +1,7 @@
 "use client";
 
 import { unlockLetter } from "@/actions/unlockLetter";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/buttons/button";
 import {
   Dialog,
   DialogContent,

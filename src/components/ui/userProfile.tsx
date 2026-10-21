@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "./button";
+import { Button } from "./buttons/button";
 import { LogOut, UserRound } from "lucide-react";
 import { signOut } from "next-auth/react";
 import DropdownMenu, { DropdownArrayProps } from "./dropdown";

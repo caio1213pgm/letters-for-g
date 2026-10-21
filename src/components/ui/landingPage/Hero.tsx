@@ -1,6 +1,6 @@
 import { Heart, Lock, PenLine, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../button";
+import { Button } from "../buttons/button";
 import EnvelopeMock from "./EnvelopmentMock";
 
 export default function Hero() {

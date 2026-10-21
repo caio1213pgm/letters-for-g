@@ -1,6 +1,6 @@
 "use client";
 import { loginAction } from "@/actions/login";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/buttons/button";
 import { Input } from "@/components/ui/input";
 import { loginSchema } from "@/schemas/login.schema";
 import { loginSchemaType } from "@/types/loginType";

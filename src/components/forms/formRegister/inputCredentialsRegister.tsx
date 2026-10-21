@@ -1,6 +1,6 @@
 "use client";
 import { createUser } from "@/actions/createUser";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/buttons/button";
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas/register.schema";
 import { RegisterSchemaType } from "@/types/registerType";
