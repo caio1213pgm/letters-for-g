@@ -31,7 +31,7 @@ export default function DropdownMenu({
 }: DropdownMenuProps) {
   return (
     <DropdownMenuDefault>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         {trigger || (
           <Button variant="secondary" className="cursor-pointer">
             <EllipsisIcon />
