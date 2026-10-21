@@ -41,9 +41,8 @@ export default function DropdownMenu({
       <DropdownMenuContent className="">
         {arrayContent?.map((item) => {
           return (
-            <>
+            <div key={item.id}>
               <DropdownMenuItem
-                key={item.id}
                 className={cn(
                   "rounded-md px-2 flex justify-between cursor-pointer",
                   item.variant && "text-red-400 hover:text-red-400",
@@ -55,7 +54,7 @@ export default function DropdownMenu({
                 <span>{item.icon}</span>
               </DropdownMenuItem>
               {item.separator && <DropdownMenuSeparator />}
-            </>
+            </div>
           );
         })}
       </DropdownMenuContent>
