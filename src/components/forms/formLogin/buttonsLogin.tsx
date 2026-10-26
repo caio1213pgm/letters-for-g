@@ -1,6 +1,6 @@
 import { GithubIcon } from "@/components/icons/GitHubIcon";
 import GoogleIcon from "@/components/icons/GoogleIcon";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/buttons/button";
 
 export default function ButtonsLogin() {
   return (

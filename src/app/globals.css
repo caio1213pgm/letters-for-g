@@ -117,6 +117,143 @@
   --sidebar-ring: oklch(0.56 0.021 213.5);
 }
 
+.tiptap h1 {
+  @apply text-[1.8rem] font-semibold;
+}
+.tiptap h2 {
+  @apply text-[1.5rem] font-semibold;
+}
+.tiptap h3 {
+  @apply text-[1.3rem] font-semibold;
+}
+
+@keyframes spin-360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.group:hover .group-hover\:spin-360 {
+  animation: spin-360 0.6s ease-in-out;
+}
+
+/* Abertura da carta: a aba gira, o selo some, o papel sobe e o envelope sai (~2.3s) */
+@keyframes letter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes envelope-flap {
+  0% {
+    transform: rotateX(0deg);
+    z-index: 4;
+  }
+  100% {
+    transform: rotateX(180deg);
+    z-index: 1;
+  }
+}
+@keyframes envelope-seal-off {
+  to {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes envelope-paper-up {
+  to {
+    transform: translateY(-58%);
+  }
+}
+@keyframes envelope-out {
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+.letter-rise {
+  animation: letter-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.envelope {
+  position: relative;
+  width: min(320px, 80vw);
+  aspect-ratio: 32 / 21;
+  animation: envelope-out 0.45s ease-in 1.85s forwards;
+}
+.envelope-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--primary) 16%, var(--background));
+}
+.envelope-paper {
+  position: absolute;
+  inset: 7% 7% auto;
+  height: 84%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12% 10% 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  animation: envelope-paper-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.8s
+    forwards;
+}
+.envelope-front {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--primary) 9%, var(--background));
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+}
+.envelope-flap {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 58%;
+  z-index: 4;
+  transform-origin: top center;
+  animation: envelope-flap 0.65s ease-in-out 0.2s forwards;
+}
+.envelope-flap-shape {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--primary) 22%, var(--background));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.envelope-seal {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: -24px 0 0 -20px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  animation: envelope-seal-off 0.25s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-rise,
+  .envelope,
+  .envelope * {
+    animation: none !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -1,5 +1,6 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { createUser } from "@/actions/createUser";
+import { Button } from "@/components/ui/buttons/button";
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas/register.schema";
 import { RegisterSchemaType } from "@/types/registerType";
@@ -14,8 +15,9 @@ export default function InputCredentialRegister() {
   } = useForm<RegisterSchemaType>({
     resolver: zodResolver(registerSchema),
   });
-  const onSubmit = (data: RegisterSchemaType) => {
-    console.log(data);
+  const onSubmit = async (data: RegisterSchemaType) => {
+    const newUser = await createUser(data);
+    console.log(newUser);
   };
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -53,7 +55,7 @@ export default function InputCredentialRegister() {
       {errors.confirmPassword && (
         <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
       )}
-      <Button>Confirmar</Button>
+      <Button type="submit">Confirmar</Button>
     </form>
   );
 }

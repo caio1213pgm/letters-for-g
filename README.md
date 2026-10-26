@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Letters for G 💌
 
-## Getting Started
+Aplicação web full-stack para criação e gerenciamento de cartas, com editor de texto rico, autenticação de usuários e persistência em banco de dados PostgreSQL.
 
-First, run the development server:
+## ✨ Funcionalidades
+
+- **Autenticação de usuários** — cadastro e login via credenciais (e-mail/senha), com senhas armazenadas de forma segura e sessões baseadas em JWT.
+- **Dashboard privado** — área autenticada onde o usuário visualiza suas cartas em formato de cards.
+- **Editor de texto rico** — criação e edição de cartas com o editor [Tiptap](https://tiptap.dev/), incluindo suporte a formatação de texto e cabeçalhos.
+- **Validação de formulários** — formulários validados com Zod + React Hook Form.
+- **Rotas protegidas** — separação clara entre rotas públicas e privadas via route groups do Next.js App Router.
+
+## 🛠️ Tecnologias
+
+| Categoria       | Tecnologia                                        |
+| --------------- | ------------------------------------------------- |
+| Framework       | [Next.js](https://nextjs.org/) 16 (App Router)    |
+| Linguagem       | TypeScript                                        |
+| UI / Estilo     | Tailwind CSS 4 + shadcn/ui + Radix UI             |
+| Editor de texto | Tiptap 3                                          |
+| Autenticação    | NextAuth.js 5 (beta) — Credentials Provider + JWT |
+| Banco de dados  | PostgreSQL                                        |
+| ORM             | Prisma 7 (com `@prisma/adapter-pg`)               |
+| Formulários     | React Hook Form + Zod                             |
+
+## 📂 Estrutura do projeto
+
+```
+src/
+├── app/
+│   ├── (public)/        # Rotas públicas: landing page, login, registro
+│   ├── (private)/       # Rotas privadas: dashboard (requer autenticação)
+│   └── api/auth/         # Rota de API do NextAuth.js
+├── actions/              # Server actions (login, registro, busca de cartas)
+├── components/
+│   ├── ui/               # Componentes de UI reutilizáveis (shadcn/ui)
+│   ├── layout/            # Headers e footers (público/privado)
+│   ├── forms/              # Formulários de login e registro
+│   └── editor/            # Editor de texto Tiptap
+├── lib/                  # Configuração do NextAuth, cliente Prisma, utilitários
+├── schemas/              # Schemas de validação Zod
+├── types/                # Tipos TypeScript compartilhados
+└── generated/prisma/      # Tipos gerados automaticamente pelo Prisma (não editar)
+
+prisma/
+├── schema.prisma         # Definição do banco de dados (User, Letter, Account, Session...)
+└── migrations/           # Histórico de migrações
+```
+
+## 🚀 Como rodar o projeto
+
+### Pré-requisitos
+
+- Node.js
+- Um banco de dados PostgreSQL
+
+### 1. Instalar as dependências
+
+```bash
+npm install
+```
+
+### 2. Configurar variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto com as variáveis necessárias para autenticação e conexão com o banco de dados. Consulte um mantenedor do projeto ou a documentação interna para obter os valores.
+
+### 3. Rodar as migrações do banco de dados
+
+```bash
+npx prisma migrate dev
+```
+
+### 4. Iniciar o servidor de desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação estará disponível em [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📜 Scripts disponíveis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev              # Inicia o servidor de desenvolvimento
+npm run build            # Gera o build de produção
+npm start                # Roda o build de produção
+npm run lint              # Executa o ESLint
+```
 
-## Learn More
+### Comandos úteis do Prisma
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npx prisma migrate dev --name <nome_da_migração>  # Cria e roda uma nova migração
+npx prisma migrate deploy                          # Aplica migrações pendentes (CI/produção)
+npx prisma generate                                # Regenera os tipos do Prisma
+npx prisma studio                                  # Abre a interface visual do Prisma Studio
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🗄️ Modelo de dados
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **User** — dados do usuário, com relação para credenciais, contas OAuth, sessões e cartas.
+- **Credential** — hash da senha do usuário (autenticação por credenciais).
+- **Letter** — carta escrita pelo usuário, com título, texto, status e contagem de leitores.
+- **Account / Session / VerificationToken** — suporte a autenticação OAuth e gerenciamento de sessão (extensibilidade futura).
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Feito com 💙 para G.
