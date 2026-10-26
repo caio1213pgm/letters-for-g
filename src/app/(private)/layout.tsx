@@ -12,7 +12,7 @@ export default function PrivateLayout({
       <SessionProvider>
         <AuthProvider>
           <PrivateHeader />
-          <div className="max-w-3xl h-full my-auto mx-auto">{children}</div>
+          <div className="max-w-5xl h-full my-auto mx-auto">{children}</div>
         </AuthProvider>
       </SessionProvider>
     </>
