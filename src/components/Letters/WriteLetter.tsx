@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Tiptap from "../editor/Tiptap";
 import LetterPasswordModal from "./LetterPasswordModal";
+import { updateLetter } from "@/actions/updateLetter";
 
 type WriteLetterProps = {
   letterData?: any;
@@ -17,6 +18,9 @@ type WriteLetterProps = {
 
 export default function WriteLetter({ letterData }: WriteLetterProps) {
   const [title, setTitle] = useState(letterData ? letterData.title : "");
+  const [readerName, setReaderName] = useState(
+    letterData ? letterData.readerName : "",
+  );
   const [text, setText] = useState<string>(letterData?.text || "");
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [letterLink, setLetterLink] = useState<string | null>(null);
@@ -56,6 +60,32 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
     });
   };
 
+  const handleUpdate = () => {
+    if (!letterData) return;
+
+    startTransition(async () => {
+      const letterUpdateData = {
+        text: text,
+        id: letterData.id,
+        readerName: readerName,
+      };
+      const letter = await updateLetter({ letterData: letterUpdateData });
+    });
+  };
+
+  function labelButton() {
+    if (letterData) {
+      return "Alterar carta";
+    }
+    if (isPending) {
+      return "Criando...";
+    }
+    if (isPending && letterData) {
+      return "Alterando carta";
+    }
+    return "Criar carta";
+  }
+
   return (
     <section className="w-full py-4 md:py-6">
       <div className="mx-auto flex min-w-2xl md:max-w-2xl flex-col items-center gap-5 px-4">
@@ -75,24 +105,37 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
 
         <div className="w-full rounded-3xl border border-border bg-card p-5 shadow-xl shadow-primary/5 md:p-6">
           <Input
-            label="Título"
+            label={!!letterData ? "" : "Título"}
             placeholder="Dê um título para sua carta"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="h-auto rounded-none border-0 border-b border-dashed border-border bg-transparent px-0 pb-4 font-heading text-2xl text-foreground shadow-none focus-visible:border-primary focus-visible:ring-0 md:text-3xl"
+            disabled={!!letterData}
+            className="h-auto rounded-md border-0 border-b border-dashed border-border bg-transparent px-4 py-2 font-heading text-2xl text-foreground shadow-none focus-visible:border-primary focus-visible:ring-0 md:text-3xl"
           />
 
           <div className="mt-5">
-            <Tiptap content={letterData?.text || ""} onChange={setText} />
+            <Tiptap content={text} onChange={setText} />
           </div>
 
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-between">
+            <Input
+              label=""
+              placeholder="Para:"
+              value={readerName}
+              onChange={(e) => setReaderName(e.target.value)}
+              // className="rounded-none border-0 border-b border-dashed border-border bg-transparent px-0 pb-4 font-heading text-2xl text-foreground shadow-none focus-visible:border-primary focus-visible:ring-0 md:text-3xl"
+            />
             <Button
-              onClick={() => !letterData && setIsPasswordOpen(true)}
+              onClick={() => {
+                if (!letterData) {
+                  setIsPasswordOpen(true);
+                }
+                handleUpdate();
+              }}
               disabled={!canSubmit || isPending}
             >
               <Send />
-              {isPending ? "Criando..." : "Criar carta"}
+              {labelButton()}
             </Button>
           </div>
         </div>
