@@ -67,7 +67,7 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
   const verifyEditPassword = async (
     password: string,
   ): Promise<LetterPasswordResult> => {
-    const isValid = await checkLetterPassword(letterData.slug, password);
+    const isValid = await checkLetterPassword(letterData?.slug, password);
     return isValid ? { status: "ok" } : { status: "invalid" };
   };
 
@@ -77,8 +77,8 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
     startTransition(async () => {
       const letterUpdateData = {
         text: text,
-        id: letterData.id,
-        slug: letterData.slug,
+        id: letterData?.id,
+        slug: letterData?.slug,
         readerName: readerName,
       };
       await updateLetter({
@@ -102,15 +102,17 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
     return "Criar carta";
   }
 
+  const isRenderUnlockModal = !!letterData && isUnlockOpen;
+
   return (
     <section className="w-full py-4 md:py-6">
-      <div className="mx-auto flex min-w-2xl md:max-w-2xl flex-col items-center gap-5 px-4">
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-4">
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <PenLine className="h-3 w-3 text-primary" />
             Nova carta
           </span>
-          <h1 className="font-heading text-3xl leading-tight tracking-tight md:text-4xl">
+          <h1 className="font-heading text-2xl leading-tight tracking-tight sm:text-3xl md:text-4xl">
             Um editor calmo, sem distrações.
           </h1>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
@@ -119,7 +121,7 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
           </p>
         </div>
 
-        <div className="w-full rounded-3xl border border-border bg-card p-5 shadow-xl shadow-primary/5 md:p-6">
+        <div className="w-full rounded-3xl border border-border bg-card p-4 shadow-xl shadow-primary/5 sm:p-5 md:p-6">
           <Input
             label={!!letterData ? "" : "Título"}
             placeholder="Dê um título para sua carta"
@@ -133,14 +135,16 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
             <Tiptap content={text} onChange={setText} />
           </div>
 
-          <div className="mt-4 flex justify-between">
-            <Input
-              label=""
-              placeholder="Para:"
-              value={readerName}
-              onChange={(e) => setReaderName(e.target.value)}
-              // className="rounded-none border-0 border-b border-dashed border-border bg-transparent px-0 pb-4 font-heading text-2xl text-foreground shadow-none focus-visible:border-primary focus-visible:ring-0 md:text-3xl"
-            />
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="w-full sm:max-w-xs">
+              <Input
+                label=""
+                placeholder="Para:"
+                value={readerName}
+                onChange={(e) => setReaderName(e.target.value)}
+                className="h-11 text-base"
+              />
+            </div>
             <Button
               onClick={() => {
                 if (letterData) {
@@ -150,6 +154,7 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
                 setIsPasswordOpen(true);
               }}
               disabled={!canSubmit || isPending}
+              className="h-11 w-full sm:w-auto"
             >
               <Send />
               {labelButton()}
@@ -169,13 +174,13 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
         onFinish={() => router.push("/dashboard")}
       />
 
-      {letterData && isUnlockOpen && (
+      {isRenderUnlockModal && (
         <LetterUnlockModal
           mode="edit"
           preview={{
-            slug: letterData.slug,
-            authorName: letterData.authorName,
-            passwordHint: letterData.passwordHint,
+            slug: letterData?.slug || "",
+            authorName: letterData?.authorName || "",
+            passwordHint: letterData?.passwordHint || "",
           }}
           verifyPassword={verifyEditPassword}
           onUnlocked={handleEditUnlocked}

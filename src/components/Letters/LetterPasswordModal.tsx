@@ -83,15 +83,15 @@ export default function LetterPasswordModal({
               </DialogDescription>
             </div>
 
-            <div className="flex w-full items-center gap-2 rounded-xl border border-dashed border-border bg-muted/50 py-1.5 pr-1.5 pl-3">
-              <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+            <div className="flex w-full flex-col gap-2 rounded-xl border border-dashed border-border bg-muted/50 p-2 sm:flex-row sm:items-center sm:py-1.5 sm:pr-1.5 sm:pl-3">
+              <span className="min-w-0 flex-1 truncate px-1 text-sm text-muted-foreground sm:px-0">
                 {letterLink}
               </span>
               <Button
                 type="button"
                 variant="outline"
                 onClick={onCopyLink}
-                className="h-9 rounded-lg"
+                className="h-10 w-full rounded-lg sm:h-9 sm:w-auto"
               >
                 {linkCopied ? <Check /> : <Copy />}
                 {linkCopied ? "Copiado" : "Copiar link"}

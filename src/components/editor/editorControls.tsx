@@ -79,7 +79,7 @@ export default function EditorControls({ editor }: EditorControlsProps) {
           title={control.label}
           onClick={control.action}
           className={cn(
-            "rounded-full text-muted-foreground",
+            "size-9 rounded-full text-muted-foreground sm:size-7",
             control.isActive &&
               "bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary",
           )}
@@ -97,7 +97,7 @@ export default function EditorControls({ editor }: EditorControlsProps) {
           editor?.chain().focus().unsetAllMarks().run();
           editor?.chain().focus().clearNodes().run();
         }}
-        className="rounded-full text-muted-foreground"
+        className="size-9 rounded-full text-muted-foreground sm:size-7"
       >
         <RemoveFormatting className="h-4 w-4" />
       </Button>

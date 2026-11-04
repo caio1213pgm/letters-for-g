@@ -8,6 +8,9 @@ export async function checkLetterPassword(
   slug: string,
   password: string,
 ): Promise<boolean> {
+  // Prisma ignora filtros com undefined, então sem slug a busca traria qualquer carta do autor
+  if (!slug) return false;
+
   const parsed = unlockLetterSchema.safeParse({ password });
   if (!parsed.success) return false;
 
