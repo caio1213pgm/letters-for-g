@@ -17,3 +17,11 @@ export type UnlockLetterResult =
   | { status: "invalid"; remainingAttempts: number }
   | { status: "blocked"; retryInMinutes: number }
   | { status: "not_found" };
+
+// Resultado genérico da conferência de senha: o autor não tem contador de tentativas
+// e não recebe a carta de volta
+export type LetterPasswordResult =
+  | { status: "ok"; letter?: UnlockedLetterType }
+  | { status: "invalid"; remainingAttempts?: number }
+  | { status: "blocked"; retryInMinutes: number }
+  | { status: "not_found" };

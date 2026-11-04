@@ -2,14 +2,17 @@
 "use client";
 
 import { createLetter } from "@/actions/createLetter";
+import { checkLetterPassword } from "@/actions/checkLetterPassword";
 import { Button } from "@/components/ui/buttons/button";
 import { Input } from "@/components/ui/input";
+import { LetterPasswordResult } from "@/types/letterReaderType";
 import { LetterPasswordSchemaType } from "@/types/letterPasswordType";
 import { PenLine, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Tiptap from "../editor/Tiptap";
 import LetterPasswordModal from "./LetterPasswordModal";
+import LetterUnlockModal from "./LetterUnlockModal";
 import { updateLetter } from "@/actions/updateLetter";
 
 type WriteLetterProps = {
@@ -23,6 +26,7 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
   );
   const [text, setText] = useState<string>(letterData?.text || "");
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [isUnlockOpen, setIsUnlockOpen] = useState(false);
   const [letterLink, setLetterLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -60,16 +64,28 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
     });
   };
 
-  const handleUpdate = () => {
-    if (!letterData) return;
+  const verifyEditPassword = async (
+    password: string,
+  ): Promise<LetterPasswordResult> => {
+    const isValid = await checkLetterPassword(letterData.slug, password);
+    return isValid ? { status: "ok" } : { status: "invalid" };
+  };
 
+  // Só é chamada depois que a senha foi confirmada no modal
+  const handleEditUnlocked = (password: string) => {
+    setIsUnlockOpen(false);
     startTransition(async () => {
       const letterUpdateData = {
         text: text,
         id: letterData.id,
+        slug: letterData.slug,
         readerName: readerName,
       };
-      const letter = await updateLetter({ letterData: letterUpdateData });
+      await updateLetter({
+        letterData: letterUpdateData,
+        password,
+      });
+      router.push("/dashboard");
     });
   };
 
@@ -127,10 +143,11 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
             />
             <Button
               onClick={() => {
-                if (!letterData) {
-                  setIsPasswordOpen(true);
+                if (letterData) {
+                  setIsUnlockOpen(true);
+                  return;
                 }
-                handleUpdate();
+                setIsPasswordOpen(true);
               }}
               disabled={!canSubmit || isPending}
             >
@@ -151,6 +168,20 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
         onCopyLink={() => letterLink && copyLink(letterLink)}
         onFinish={() => router.push("/dashboard")}
       />
+
+      {letterData && isUnlockOpen && (
+        <LetterUnlockModal
+          mode="edit"
+          preview={{
+            slug: letterData.slug,
+            authorName: letterData.authorName,
+            passwordHint: letterData.passwordHint,
+          }}
+          verifyPassword={verifyEditPassword}
+          onUnlocked={handleEditUnlocked}
+          onCancel={() => setIsUnlockOpen(false)}
+        />
+      )}
     </section>
   );
 }

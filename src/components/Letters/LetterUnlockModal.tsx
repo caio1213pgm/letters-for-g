@@ -1,6 +1,5 @@
 "use client";
 
-import { unlockLetter } from "@/actions/unlockLetter";
 import { Button } from "@/components/ui/buttons/button";
 import {
   Dialog,
@@ -9,12 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { unlockLetterSchema } from "@/schemas/unlockLetter.schema";
 import {
+  LetterPasswordResult,
   LetterPreviewType,
   UnlockedLetterType,
 } from "@/types/letterReaderType";
 import { UnlockLetterSchemaType } from "@/types/unlockLetterType";
+import { unlockLetterSchema } from "@/schemas/unlockLetter.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, LockOpen } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -22,10 +22,16 @@ import { useForm } from "react-hook-form";
 
 type LetterUnlockModalProps = {
   preview: LetterPreviewType;
-  onUnlocked: (letter: UnlockedLetterType) => void;
+  // "read": leitor abrindo a carta. "edit": autor confirmando a senha para alterar
+  mode?: "read" | "edit";
+  verifyPassword: (password: string) => Promise<LetterPasswordResult>;
+  onUnlocked: (password: string, letter?: UnlockedLetterType) => void;
+  // Com onCancel o modal pode ser fechado; sem ele, o leitor precisa digitar a senha
+  onCancel?: () => void;
 };
 
-function attemptsMessage(remaining: number) {
+function invalidMessage(remaining: number | undefined) {
+  if (remaining === undefined) return "Senha incorreta.";
   return remaining === 1
     ? "Senha incorreta. Resta 1 tentativa."
     : `Senha incorreta. Restam ${remaining} tentativas.`;
@@ -37,7 +43,10 @@ function blockedMessage(minutes: number) {
 
 export default function LetterUnlockModal({
   preview,
+  mode = "read",
+  verifyPassword,
   onUnlocked,
+  onCancel,
 }: LetterUnlockModalProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isBlocked, setIsBlocked] = useState(false);
@@ -53,20 +62,21 @@ export default function LetterUnlockModal({
     defaultValues: { password: "" },
   });
 
+  const isEdit = mode === "edit";
   const author = preview.authorName || "Alguém";
   const errorMessage = errors.password?.message ?? serverError;
 
   const onSubmit = ({ password }: UnlockLetterSchemaType) => {
     setServerError(null);
     startTransition(async () => {
-      const result = await unlockLetter(preview.slug, password);
+      const result = await verifyPassword(password);
 
       if (result.status === "ok") {
-        onUnlocked(result.letter);
+        onUnlocked(password, result.letter);
         return;
       }
       if (result.status === "invalid") {
-        setServerError(attemptsMessage(result.remainingAttempts));
+        setServerError(invalidMessage(result.remainingAttempts));
       }
       if (result.status === "blocked") {
         setIsBlocked(true);
@@ -81,10 +91,14 @@ export default function LetterUnlockModal({
   };
 
   return (
-    <Dialog open>
+    <Dialog open onOpenChange={(next) => !next && onCancel?.()}>
       <DialogContent
-        onEscapeKeyDown={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => {
+          if (!onCancel) e.preventDefault();
+        }}
+        onInteractOutside={(e) => {
+          if (!onCancel) e.preventDefault();
+        }}
         className="flex flex-col items-center gap-5 px-5 pt-8 pb-6 sm:px-7"
       >
         <div className="grid size-18 place-items-center rounded-full border-[1.5px] border-dashed border-primary/45">
@@ -95,18 +109,19 @@ export default function LetterUnlockModal({
 
         <div className="flex flex-col items-center gap-1.5 text-center">
           <DialogTitle className="text-2xl tracking-tight">
-            Esta carta está lacrada
+            {isEdit ? "Confirme a senha" : "Esta carta está lacrada"}
           </DialogTitle>
           <DialogDescription className="max-w-75 leading-relaxed">
-            {author} deixou uma carta para você. Digite a senha que vocês
-            combinaram para abrir.
+            {isEdit
+              ? "Digite a senha da carta para poder alterá-la."
+              : `${author} deixou uma carta para você. Digite a senha que vocês combinaram para abrir.`}
           </DialogDescription>
         </div>
 
         {preview.passwordHint && (
           <div className="flex w-full flex-col gap-0.5 rounded-2xl border border-dashed border-primary/35 bg-primary/5 px-3.5 py-3">
             <span className="text-xs font-medium text-primary">
-              Dica de {author}
+              {isEdit ? "Sua dica" : `Dica de ${author}`}
             </span>
             <span className="text-sm text-foreground">
               {preview.passwordHint}
@@ -143,8 +158,26 @@ export default function LetterUnlockModal({
             className="h-11 w-full rounded-xl"
           >
             <LockOpen />
-            {isPending ? "Abrindo..." : "Abrir carta"}
+            {isPending
+              ? isEdit
+                ? "Confirmando..."
+                : "Abrindo..."
+              : isEdit
+                ? "Confirmar"
+                : "Abrir carta"}
           </Button>
+
+          {onCancel && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onCancel}
+              disabled={isPending}
+              className="h-10 w-full rounded-xl text-muted-foreground"
+            >
+              Cancelar
+            </Button>
+          )}
         </form>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,6 @@
 "use client";
 
+import { unlockLetter } from "@/actions/unlockLetter";
 import {
   LetterPreviewType,
   UnlockedLetterType,
@@ -41,7 +42,8 @@ export default function LetterReader({
     };
   }, []);
 
-  const handleUnlocked = (unlocked: UnlockedLetterType) => {
+  const handleUnlocked = (_password: string, unlocked?: UnlockedLetterType) => {
+    if (!unlocked) return;
     setLetter(unlocked);
     setAnimateLetter(true);
 
@@ -77,7 +79,11 @@ export default function LetterReader({
         <div className="h-3 w-full rounded-full bg-muted" />
         <div className="h-3 w-3/5 rounded-full bg-muted" />
       </div>
-      <LetterUnlockModal preview={preview} onUnlocked={handleUnlocked} />
+      <LetterUnlockModal
+        preview={preview}
+        verifyPassword={(password) => unlockLetter(preview.slug, password)}
+        onUnlocked={handleUnlocked}
+      />
     </>
   );
 }
