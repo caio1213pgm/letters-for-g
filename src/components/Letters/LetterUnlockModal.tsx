@@ -93,6 +93,7 @@ export default function LetterUnlockModal({
   return (
     <Dialog open onOpenChange={(next) => !next && onCancel?.()}>
       <DialogContent
+        showCloseButton={false}
         onEscapeKeyDown={(e) => {
           if (!onCancel) e.preventDefault();
         }}

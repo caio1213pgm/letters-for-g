@@ -2,42 +2,39 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "./button";
 import { deleteLetter } from "@/actions/deleteLetter";
-import { checkLetterPassword } from "@/actions/checkLetterPassword";
 import { ModalDeleteLetter } from "../modals/ModalDeleteLetter";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
-export default function TrashButton({
-  letterId,
-}: {
-  letterId: string | number;
-}) {
+type TrashButtonProps = {
+  slug: string;
+  hasPassword: boolean;
+};
+
+export default function TrashButton({ slug, hasPassword }: TrashButtonProps) {
   const [openModal, setOpenModal] = useState(false);
-  const slug = letterId.toString();
-
-  const handleValidatePassword = useCallback(
-    (password: string) => checkLetterPassword(slug, password),
-    [slug],
-  );
 
   const handleDeleteLetter = async (password: string) => {
-    const deleteitem = await deleteLetter(letterId, password);
-    if (deleteitem) {
-      setOpenModal(false);
-    }
+    const result = await deleteLetter(slug, password);
+    if (!result.ok) return result.error;
+    setOpenModal(false);
+    return null;
   };
+
   return (
     <>
       <Button
         onClick={() => setOpenModal(true)}
         variant="outline"
+        title="Excluir carta"
         className="max-w-10 rounded-md py-4 cursor-pointer"
       >
         <Trash2 />
+        <span className="sr-only">Excluir carta</span>
       </Button>
       <ModalDeleteLetter
         open={openModal}
         setOpen={setOpenModal}
-        onValidatePassword={handleValidatePassword}
+        requiresPassword={hasPassword}
         onConfirm={handleDeleteLetter}
       />
     </>

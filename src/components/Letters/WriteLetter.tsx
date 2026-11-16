@@ -1,39 +1,41 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { createLetter } from "@/actions/createLetter";
 import { checkLetterPassword } from "@/actions/checkLetterPassword";
+import { updateLetter } from "@/actions/updateLetter";
 import { Button } from "@/components/ui/buttons/button";
 import { Input } from "@/components/ui/input";
 import { LetterPasswordResult } from "@/types/letterReaderType";
 import { LetterPasswordSchemaType } from "@/types/letterPasswordType";
+import { EditableLetterType } from "@/types/letterType";
+import { stripHtml } from "@/utils/stripHtml";
 import { PenLine, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Tiptap from "../editor/Tiptap";
 import LetterPasswordModal from "./LetterPasswordModal";
 import LetterUnlockModal from "./LetterUnlockModal";
-import { updateLetter } from "@/actions/updateLetter";
 
 type WriteLetterProps = {
-  letterData?: any;
+  letterData?: EditableLetterType;
 };
 
 export default function WriteLetter({ letterData }: WriteLetterProps) {
-  const [title, setTitle] = useState(letterData ? letterData.title : "");
-  const [readerName, setReaderName] = useState(
-    letterData ? letterData.readerName : "",
-  );
-  const [text, setText] = useState<string>(letterData?.text || "");
+  const isEdit = letterData !== undefined;
+
+  const [title, setTitle] = useState(letterData?.title ?? "");
+  const [readerName, setReaderName] = useState(letterData?.readerName ?? "");
+  const [text, setText] = useState(letterData?.text ?? "");
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isUnlockOpen, setIsUnlockOpen] = useState(false);
   const [letterLink, setLetterLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const canSubmit =
-    title.trim() !== "" && text.replace(/<[^>]*>/g, "").trim() !== "";
+    title.trim() !== "" && readerName.trim() !== "" && stripHtml(text) !== "";
 
   const copyLink = async (link: string) => {
     try {
@@ -49,16 +51,22 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
     password,
     passwordHint,
   }: LetterPasswordSchemaType) => {
-    if (letterData) return;
+    if (isEdit) return;
+    setFormError(null);
 
     startTransition(async () => {
-      const { slug } = await createLetter({
+      const result = await createLetter({
         title: title.trim(),
+        readerName: readerName.trim(),
         text,
         password,
         passwordHint,
       });
-      const link = `${window.location.origin}/letter/${slug}`;
+      if (!result.ok) {
+        setFormError(result.error);
+        return;
+      }
+      const link = `${window.location.origin}/letter/${result.data.slug}`;
       setLetterLink(link);
       await copyLink(link);
     });
@@ -67,42 +75,52 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
   const verifyEditPassword = async (
     password: string,
   ): Promise<LetterPasswordResult> => {
-    const isValid = await checkLetterPassword(letterData?.slug, password);
+    if (!letterData) return { status: "not_found" };
+    const isValid = await checkLetterPassword(letterData.slug, password);
     return isValid ? { status: "ok" } : { status: "invalid" };
   };
 
   // Só é chamada depois que a senha foi confirmada no modal
+  // (ou direto, para cartas antigas sem senha)
   const handleEditUnlocked = (password: string) => {
+    if (!letterData) return;
     setIsUnlockOpen(false);
+    setFormError(null);
     startTransition(async () => {
-      const letterUpdateData = {
-        text: text,
-        id: letterData?.id,
-        slug: letterData?.slug,
-        readerName: readerName,
-      };
-      await updateLetter({
-        letterData: letterUpdateData,
+      const result = await updateLetter({
+        slug: letterData.slug,
+        letterData: {
+          title: title.trim(),
+          readerName: readerName.trim(),
+          text,
+        },
         password,
       });
+      if (!result.ok) {
+        setFormError(result.error);
+        return;
+      }
       router.push("/dashboard");
     });
   };
 
-  function labelButton() {
-    if (letterData) {
-      return "Alterar carta";
+  const handleSubmitClick = () => {
+    setFormError(null);
+    if (!isEdit) {
+      setIsPasswordOpen(true);
+      return;
     }
-    if (isPending) {
-      return "Criando...";
+    if (letterData.hasPassword) {
+      setIsUnlockOpen(true);
+      return;
     }
-    if (isPending && letterData) {
-      return "Alterando carta";
-    }
-    return "Criar carta";
-  }
+    handleEditUnlocked("");
+  };
 
-  const isRenderUnlockModal = !!letterData && isUnlockOpen;
+  function labelButton() {
+    if (isPending) return isEdit ? "Alterando..." : "Criando...";
+    return isEdit ? "Alterar carta" : "Criar carta";
+  }
 
   return (
     <section className="w-full py-4 md:py-6">
@@ -110,7 +128,7 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <PenLine className="h-3 w-3 text-primary" />
-            Nova carta
+            {isEdit ? "Alterar carta" : "Nova carta"}
           </span>
           <h1 className="font-heading text-2xl leading-tight tracking-tight sm:text-3xl md:text-4xl">
             Um editor calmo, sem distrações.
@@ -123,11 +141,11 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
 
         <div className="w-full rounded-3xl border border-border bg-card p-4 shadow-xl shadow-primary/5 sm:p-5 md:p-6">
           <Input
-            label={!!letterData ? "" : "Título"}
+            label="Título"
             placeholder="Dê um título para sua carta"
             value={title}
+            maxLength={120}
             onChange={(e) => setTitle(e.target.value)}
-            disabled={!!letterData}
             className="h-auto rounded-md border-0 border-b border-dashed border-border bg-transparent px-4 py-2 font-heading text-2xl text-foreground shadow-none focus-visible:border-primary focus-visible:ring-0 md:text-3xl"
           />
 
@@ -138,21 +156,16 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="w-full sm:max-w-xs">
               <Input
-                label=""
-                placeholder="Para:"
+                label="Para"
+                placeholder="Nome de quem vai ler"
                 value={readerName}
+                maxLength={80}
                 onChange={(e) => setReaderName(e.target.value)}
                 className="h-11 text-base"
               />
             </div>
             <Button
-              onClick={() => {
-                if (letterData) {
-                  setIsUnlockOpen(true);
-                  return;
-                }
-                setIsPasswordOpen(true);
-              }}
+              onClick={handleSubmitClick}
               disabled={!canSubmit || isPending}
               className="h-11 w-full sm:w-auto"
             >
@@ -160,6 +173,12 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
               {labelButton()}
             </Button>
           </div>
+
+          {formError && (
+            <p role="alert" className="mt-3 text-sm text-red-500">
+              {formError}
+            </p>
+          )}
         </div>
       </div>
 
@@ -168,19 +187,20 @@ export default function WriteLetter({ letterData }: WriteLetterProps) {
         onOpenChange={setIsPasswordOpen}
         onConfirm={handleCreate}
         isPending={isPending}
+        error={formError}
         letterLink={letterLink}
         linkCopied={linkCopied}
         onCopyLink={() => letterLink && copyLink(letterLink)}
         onFinish={() => router.push("/dashboard")}
       />
 
-      {isRenderUnlockModal && (
+      {isEdit && isUnlockOpen && (
         <LetterUnlockModal
           mode="edit"
           preview={{
-            slug: letterData?.slug || "",
-            authorName: letterData?.authorName || "",
-            passwordHint: letterData?.passwordHint || "",
+            slug: letterData.slug,
+            authorName: letterData.authorName,
+            passwordHint: letterData.passwordHint,
           }}
           verifyPassword={verifyEditPassword}
           onUnlocked={handleEditUnlocked}

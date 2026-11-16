@@ -9,58 +9,47 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Button } from "../button";
-
-const VALIDATION_DELAY_MS = 300;
+import { ChangeEvent, FormEvent, useState } from "react";
+import { Button } from "../buttons/button";
 
 type ModalDeleteLetterProps = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  onValidatePassword: (password: string) => Promise<boolean>;
-  onConfirm: (password: string) => Promise<void>;
+  // Cartas antigas sem senha só pedem a confirmação
+  requiresPassword: boolean;
+  // Retorna a mensagem de erro, ou null quando a carta foi excluída
+  onConfirm: (password: string) => Promise<string | null>;
 };
 
 type DeleteLetterFormProps = Pick<
   ModalDeleteLetterProps,
-  "onValidatePassword" | "onConfirm"
+  "requiresPassword" | "onConfirm"
 >;
 
 function DeleteLetterForm({
-  onValidatePassword,
+  requiresPassword,
   onConfirm,
 }: DeleteLetterFormProps) {
   const [password, setPassword] = useState("");
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    if (password === "") return;
-
-    let isCurrent = true;
-    const timer = setTimeout(async () => {
-      const isValid = await onValidatePassword(password);
-      if (isCurrent) setIsPasswordValid(isValid);
-    }, VALIDATION_DELAY_MS);
-
-    return () => {
-      isCurrent = false;
-      clearTimeout(timer);
-    };
-  }, [password, onValidatePassword]);
+  const canSubmit = !isDeleting && (!requiresPassword || password !== "");
 
   const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
-    setIsPasswordValid(false);
+    setError(null);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isPasswordValid || isDeleting) return;
+    if (!canSubmit) return;
 
     setIsDeleting(true);
+    setError(null);
     try {
-      await onConfirm(password);
+      const result = await onConfirm(password);
+      if (result) setError(result);
     } finally {
       setIsDeleting(false);
     }
@@ -71,30 +60,48 @@ function DeleteLetterForm({
       <DialogHeader>
         <DialogTitle>Excluir carta</DialogTitle>
         <DialogDescription>
-          Uma carta excluída não pode ser restaurada. <br />{" "}
-          <span className="text-gray-700 font-semibold">
-            Digite a senha da carta para confirmar.
-          </span>
+          Uma carta excluída não pode ser restaurada.
+          {requiresPassword && (
+            <>
+              <br />
+              <span className="font-semibold text-foreground">
+                Digite a senha da carta para confirmar.
+              </span>
+            </>
+          )}
         </DialogDescription>
       </DialogHeader>
-      <Input
-        label="Senha da carta"
-        type="password"
-        placeholder="Digite a senha"
-        autoComplete="off"
-        autoFocus
-        value={password}
-        onChange={handlePasswordChange}
-      />
+      {requiresPassword && (
+        <div className="flex flex-col gap-1.5">
+          <Input
+            label="Senha da carta"
+            type="password"
+            placeholder="Digite a senha"
+            autoComplete="off"
+            autoFocus
+            value={password}
+            aria-invalid={!!error}
+            onChange={handlePasswordChange}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-500">
+              {error}
+            </p>
+          )}
+        </div>
+      )}
+      {!requiresPassword && error && (
+        <p role="alert" className="text-sm text-red-500">
+          {error}
+        </p>
+      )}
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="outline">Cancelar</Button>
+          <Button type="button" variant="outline" disabled={isDeleting}>
+            Cancelar
+          </Button>
         </DialogClose>
-        <Button
-          type="submit"
-          variant="destructive"
-          disabled={!isPasswordValid || isDeleting}
-        >
+        <Button type="submit" variant="destructive" disabled={!canSubmit}>
           {isDeleting ? "Excluindo..." : "Excluir"}
         </Button>
       </DialogFooter>
@@ -105,16 +112,19 @@ function DeleteLetterForm({
 export function ModalDeleteLetter({
   open,
   setOpen,
-  onValidatePassword,
+  requiresPassword,
   onConfirm,
 }: ModalDeleteLetterProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-sm">
-        <DeleteLetterForm
-          onValidatePassword={onValidatePassword}
-          onConfirm={onConfirm}
-        />
+        {/* Remontar o form a cada abertura zera senha e erro */}
+        {open && (
+          <DeleteLetterForm
+            requiresPassword={requiresPassword}
+            onConfirm={onConfirm}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

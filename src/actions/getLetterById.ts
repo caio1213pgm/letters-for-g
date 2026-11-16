@@ -1,22 +1,33 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { EditableLetterType } from "@/types/letterType";
 import { redirect } from "next/navigation";
 
-export async function getLetterById(letterId: string) {
+// Busca uma carta do autor logado pelo slug, para o editor
+export async function getLetterById(
+  slug: string,
+): Promise<EditableLetterType | null> {
   const session = await auth();
-  const user = session?.user;
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const uniqueLetter = await prisma.letter.findUnique({
-    where: { slug: letterId },
-    omit: { passwordLetter: true },
+  const letter = await prisma.letter.findFirst({
+    where: { slug, authorId: session.user.id },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      text: true,
+      readerName: true,
+      status: true,
+      authorName: true,
+      passwordHint: true,
+      passwordLetter: true,
+    },
   });
+  if (!letter) return null;
 
-  if (user.id !== uniqueLetter?.authorId) {
-    return null;
-  }
-
-  return uniqueLetter;
+  const { passwordLetter, ...rest } = letter;
+  return { ...rest, hasPassword: passwordLetter !== "" };
 }

@@ -93,10 +93,9 @@ export default function EditorControls({ editor }: EditorControlsProps) {
         variant="ghost"
         size="icon-sm"
         title="Limpar formatação"
-        onClick={() => {
-          editor?.chain().focus().unsetAllMarks().run();
-          editor?.chain().focus().clearNodes().run();
-        }}
+        onClick={() =>
+          editor?.chain().focus().unsetAllMarks().clearNodes().run()
+        }
         className="size-9 rounded-full text-muted-foreground sm:size-7"
       >
         <RemoveFormatting className="h-4 w-4" />

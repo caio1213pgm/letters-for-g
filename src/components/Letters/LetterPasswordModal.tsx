@@ -20,6 +20,7 @@ type LetterPasswordModalProps = {
   onOpenChange: (open: boolean) => void;
   onConfirm: (data: LetterPasswordSchemaType) => void;
   isPending: boolean;
+  error?: string | null;
   letterLink: string | null;
   linkCopied: boolean;
   onCopyLink: () => void;
@@ -31,6 +32,7 @@ export default function LetterPasswordModal({
   onOpenChange,
   onConfirm,
   isPending,
+  error,
   letterLink,
   linkCopied,
   onCopyLink,
@@ -59,7 +61,10 @@ export default function LetterPasswordModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="flex flex-col items-center gap-5 px-5 pt-8 pb-6 sm:px-7">
+      <DialogContent
+        showCloseButton={false}
+        className="flex flex-col items-center gap-5 px-5 pt-8 pb-6 sm:px-7"
+      >
         <div className="grid size-18 place-items-center rounded-full border-[1.5px] border-dashed border-primary/45">
           <span className="grid size-13 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40">
             {letterLink ? (
@@ -158,6 +163,12 @@ export default function LetterPasswordModal({
                   </p>
                 )}
               </div>
+
+              {error && (
+                <p role="alert" className="text-sm text-red-500">
+                  {error}
+                </p>
+              )}
 
               <div className="flex flex-col gap-1.5 pt-1">
                 <Button

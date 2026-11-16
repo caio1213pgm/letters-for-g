@@ -6,27 +6,31 @@ import { auth } from "@/auth";
 import { letterCardType } from "@/types/letterCardType";
 import { redirect } from "next/navigation";
 
-export async function getLetters() {
+export async function getLetters(): Promise<letterCardType[]> {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const user = session.user;
-  const authorId = user.id;
   const letters = await prisma.letter.findMany({
-    where: { authorId },
+    where: { authorId: session.user.id },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      slug: true,
+      title: true,
+      text: true,
+      authorName: true,
+      updatedAt: true,
+      passwordLetter: true,
+    },
   });
 
-  const mappedLetters: letterCardType[] = letters.map((item, index) => {
-    return {
-      author: item.authorName,
-      id: index,
-      lastEdit: dayjs(item.createdAt).format("DD/MM/YYYY"),
-      resume: item.text,
-      title: item.title,
-      slug: item.slug,
-    };
-  });
-  return mappedLetters;
+  return letters.map((item) => ({
+    author: item.authorName,
+    lastEdit: dayjs(item.updatedAt).format("DD/MM/YYYY"),
+    resume: item.text,
+    title: item.title,
+    slug: item.slug,
+    hasPassword: item.passwordLetter !== "",
+  }));
 }

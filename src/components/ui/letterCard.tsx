@@ -1,9 +1,8 @@
 import { letterCardType } from "@/types/letterCardType";
 import { stripHtml } from "@/utils/stripHtml";
-import { Copy, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 import TrashButton from "./buttons/trashButton";
-import { Button } from "./buttons/button";
 import CopyButton from "./buttons/copyButton";
 
 type letterCardProps = {
@@ -12,8 +11,8 @@ type letterCardProps = {
 
 export default function LetterCard({ letter }: letterCardProps) {
   return (
-    <div className="group flex min-h-44 cursor-pointer flex-col rounded-2xl border border-border bg-card px-6 py-4 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10">
-      <Link href={`/writeLetter/${letter.slug}`}>
+    <div className="group flex min-h-44 flex-col rounded-2xl border border-border bg-card px-6 py-4 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10">
+      <Link href={`/writeLetter/${letter.slug}`} className="flex flex-1 flex-col">
         <div className="flex items-center gap-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
             <Mail className="h-4 w-4" />
@@ -31,7 +30,7 @@ export default function LetterCard({ letter }: letterCardProps) {
         </div>
       </Link>
       <div className="mt-2 flex justify-between">
-        <TrashButton letterId={letter.slug} />
+        <TrashButton slug={letter.slug} hasPassword={letter.hasPassword} />
         <CopyButton letterSlug={letter.slug} />
       </div>
     </div>

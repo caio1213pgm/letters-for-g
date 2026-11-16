@@ -4,5 +4,5 @@ export type letterCardType = {
   author: string;
   slug: string;
   resume: string;
-  id: number;
+  hasPassword: boolean;
 };

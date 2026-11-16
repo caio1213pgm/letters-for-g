@@ -1,44 +1,52 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { auth } from "@/auth";
 import { checkLetterPassword } from "@/actions/checkLetterPassword";
 import { prisma } from "@/lib/prisma";
+import { letterSchema } from "@/schemas/letter.schema";
+import { ActionResult, LetterSchemaType } from "@/types/letterType";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-type updateLetterProps = {
-  letterData: {
-    text: string;
-    id: string;
-    slug: string;
-    readerName: string;
-  };
+type UpdateLetterProps = {
+  slug: string;
+  letterData: LetterSchemaType;
   password: string;
 };
 
 export async function updateLetter({
+  slug,
   letterData,
   password,
-}: updateLetterProps) {
+}: UpdateLetterProps): Promise<ActionResult> {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const isPasswordValid = await checkLetterPassword(letterData.slug, password);
-  if (!isPasswordValid) {
-    throw new Error("Senha inválida");
+  const parsed = letterSchema.safeParse(letterData);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0].message };
   }
 
-  const updateLetter = await prisma.letter.update({
-    where: {
-      id: letterData.id,
-    },
-    data: {
-      text: letterData.text,
-      readerName: letterData.readerName,
-    },
+  const isPasswordValid = await checkLetterPassword(slug, password);
+  if (!isPasswordValid) {
+    return { ok: false, error: "Senha inválida" };
+  }
+
+  // O filtro por autor e status fica na própria query: nada do cliente decide qual carta muda
+  const updated = await prisma.letter.updateMany({
+    where: { slug, authorId: session.user.id, status: { not: "READ" } },
+    data: parsed.data,
   });
 
-  return updateLetter;
+  if (updated.count === 0) {
+    return {
+      ok: false,
+      error: "Esta carta já foi lida e não pode mais ser alterada.",
+    };
+  }
+
+  revalidatePath("/dashboard");
+  return { ok: true, data: undefined };
 }

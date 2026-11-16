@@ -12,7 +12,7 @@ export default async function BoxLetters() {
       ) : (
         <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
           {lettersData.map((item) => (
-            <LetterCard letter={item} key={item.id} />
+            <LetterCard letter={item} key={item.slug} />
           ))}
           <EmptyLetter />
         </div>
