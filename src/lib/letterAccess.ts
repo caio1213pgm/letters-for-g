@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { getAuthSecret } from "./authSecret";
 
 const ACCESS_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
@@ -9,19 +10,13 @@ type LetterAccessSource = {
   passwordLetter: string;
 };
 
-function getSecret() {
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
-  if (!secret) throw new Error("AUTH_SECRET não configurado");
-  return secret;
-}
-
 function cookieName(letterId: string) {
   return `letter-access-${letterId}`;
 }
 
 // O token depende do hash da senha: se a senha mudar, o acesso antigo deixa de valer
 function createAccessToken(letter: LetterAccessSource) {
-  return createHmac("sha256", getSecret())
+  return createHmac("sha256", getAuthSecret())
     .update(`${letter.id}:${letter.passwordLetter}`)
     .digest("hex");
 }

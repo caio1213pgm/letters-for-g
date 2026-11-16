@@ -1,10 +1,11 @@
 import bcrypt from "bcryptjs";
 import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getAuthSecret } from "./authSecret";
 import { prisma } from "./prisma";
 
 const authOptions: NextAuthConfig = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: getAuthSecret(),
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -13,22 +14,28 @@ const authOptions: NextAuthConfig = {
         password: { label: "password", type: "text" },
       },
       async authorize(credentials) {
+        const email = credentials.email;
+        const password = credentials.password;
+        if (typeof email !== "string" || typeof password !== "string") {
+          return null;
+        }
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { email },
           include: { credential: true },
         });
 
         if (!user?.credential) return null;
 
         const isValidPassword = await bcrypt.compare(
-          credentials.password as string,
+          password,
           user.credential.passwordHash,
         );
 
         if (!isValidPassword) return null;
-        console.log(user);
 
-        return user;
+        // Só o necessário vai para o JWT: nunca o hash da senha
+        return { id: user.id, name: user.name, email: user.email };
       },
     }),
   ],
