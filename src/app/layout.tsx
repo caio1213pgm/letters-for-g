@@ -1,6 +1,14 @@
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Sans, Inter } from "next/font/google";
+import {
+  Caveat,
+  Dancing_Script,
+  Geist,
+  Geist_Mono,
+  Instrument_Sans,
+  Inter,
+  Lora,
+} from "next/font/google";
 import "./globals.css";
 
 const instrumentSansHeading = Instrument_Sans({
@@ -18,6 +26,25 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Fontes opcionais do editor de cartas: sem preload, só baixam quando uma carta as usa
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  preload: false,
+});
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
+  preload: false,
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -45,6 +72,9 @@ export default function RootLayout({
         "font-sans",
         inter.variable,
         instrumentSansHeading.variable,
+        lora.variable,
+        caveat.variable,
+        dancingScript.variable,
       )}
     >
       {/* Extensões do navegador (Grammarly, ColorZilla, gerenciadores de senha)
