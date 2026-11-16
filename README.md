@@ -28,19 +28,22 @@ Aplicação web full-stack para criação e gerenciamento de cartas, com editor 
 ```
 src/
 ├── app/
-│   ├── (public)/        # Rotas públicas: landing page, login, registro
-│   ├── (private)/       # Rotas privadas: dashboard (requer autenticação)
+│   ├── (public)/         # Landing page, login, registro e /letter/[slug] (leitura da carta)
+│   ├── (private)/        # Dashboard e editor (/writeLetter, /writeLetter/[id])
 │   └── api/auth/         # Rota de API do NextAuth.js
-├── actions/              # Server actions (login, registro, busca de cartas)
+├── actions/              # Server actions (auth, CRUD de cartas, desbloqueio pelo leitor)
 ├── components/
+│   ├── Letters/          # Editor da carta, modais de senha e leitura (envelope)
 │   ├── ui/               # Componentes de UI reutilizáveis (shadcn/ui)
-│   ├── layout/            # Headers e footers (público/privado)
-│   ├── forms/              # Formulários de login e registro
-│   └── editor/            # Editor de texto Tiptap
-├── lib/                  # Configuração do NextAuth, cliente Prisma, utilitários
+│   ├── layout/           # Headers e footers (público/privado)
+│   ├── forms/            # Formulários de login e registro
+│   └── editor/           # Editor de texto Tiptap
+├── lib/                  # NextAuth, cliente Prisma, cookie de acesso à carta, utilitários
+├── proxy.ts              # Proteção de rotas (redireciona quem não está logado)
 ├── schemas/              # Schemas de validação Zod
 ├── types/                # Tipos TypeScript compartilhados
-└── generated/prisma/      # Tipos gerados automaticamente pelo Prisma (não editar)
+├── utils/                # Slug, datas, limpeza de HTML
+└── generated/prisma/     # Tipos gerados automaticamente pelo Prisma (não editar)
 
 prisma/
 ├── schema.prisma         # Definição do banco de dados (User, Letter, Account, Session...)
@@ -62,7 +65,7 @@ npm install
 
 ### 2. Configurar variáveis de ambiente
 
-Crie um arquivo `.env` na raiz do projeto com as variáveis necessárias para autenticação e conexão com o banco de dados. Consulte um mantenedor do projeto ou a documentação interna para obter os valores.
+Copie `.env.example` para `.env` e preencha os valores. `AUTH_SECRET` pode ser gerado com `openssl rand -hex 32`; `DATABASE_URL` é a string de conexão do seu PostgreSQL.
 
 ### 3. Rodar as migrações do banco de dados
 
@@ -100,7 +103,8 @@ npx prisma studio                                  # Abre a interface visual do 
 
 - **User** — dados do usuário, com relação para credenciais, contas OAuth, sessões e cartas.
 - **Credential** — hash da senha do usuário (autenticação por credenciais).
-- **Letter** — carta escrita pelo usuário, com título, texto, status e contagem de leitores.
+- **Letter** — carta escrita pelo usuário, com título, texto, destinatário, senha (hash), dica, status e contagem de leitores.
+- **LetterUnlockAttempt** — tentativas de senha por IP, para limitar força bruta na página pública.
 - **Account / Session / VerificationToken** — suporte a autenticação OAuth e gerenciamento de sessão (extensibilidade futura).
 
 ---

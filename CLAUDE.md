@@ -27,8 +27,10 @@ app/
 │   ├── login/
 │   ├── register/
 │   └── layout.tsx         # Wraps with PublicHeader + PublicFooter
+│   └── letter/[slug]/     # Public letter page (password-sealed, read by the recipient)
 ├── (private)/             # Private routes - requires authentication
-│   ├── dashboard/         # Main app with Tiptap editor
+│   ├── dashboard/         # List of the author's letters
+│   ├── writeLetter/       # Tiptap editor (new letter) and writeLetter/[id] (edit by slug)
 │   └── layout.tsx         # Wraps with PrivateHeader + SessionProvider
 ├── api/auth/[...nextauth] # NextAuth.js API route
 └── layout.tsx             # Root layout (fonts, metadata, globals.css)
@@ -64,8 +66,12 @@ app/
    - `src/components/ui/landingPage/` - Landing page sections
 
 5. **Actions (Server-side)**
-   - `src/actions/createUser.ts` - User registration logic
-   - `src/actions/login.ts` - Credential-based login
+   - `src/actions/createUser.ts` / `login.ts` - Registration and credential login
+   - `src/actions/createLetter.ts` / `updateLetter.ts` / `deleteLetter.ts` - Author letter CRUD; write actions return `ActionResult` (`{ ok, data } | { ok: false, error }`) instead of throwing
+   - `src/actions/checkLetterPassword.ts` - Author confirms the letter password before edit/delete (letters without a password skip it)
+   - `src/actions/getLetters.ts` / `getLetterById.ts` - Author reads, always filtered by `authorId`
+   - `src/actions/getPublicLetter.ts` / `unlockLetter.ts` - Recipient flow: unlock with password, rate-limited per IP, access kept in an HMAC cookie (`src/lib/letterAccess.ts`)
+   - Route protection lives in `src/proxy.ts` (Next.js proxy, formerly middleware)
 
 ## Common Commands
 
@@ -96,11 +102,12 @@ npx prisma studio                               # Open Prisma Studio UI
 
 ## Environment Variables
 
-Required in `.env`:
-- `NEXTAUTH_SECRET` - JWT signing secret (32+ hex chars)
+Required in `.env` (see `.env.example`):
+- `AUTH_SECRET` - JWT signing secret (32+ hex chars). Read via `src/lib/authSecret.ts` by NextAuth, the proxy and the letter access cookies.
+- `NEXTAUTH_SECRET` - Legacy alias; if set, it must equal `AUTH_SECRET`
 - `NEXTAUTH_URL` - Auth callback URL (http://localhost:3000 locally)
+- `AUTH_TRUST_HOST` - Set to `true` behind a proxy/Docker so Auth.js trusts the request host
 - `DATABASE_URL` - PostgreSQL connection string
-- `AUTH_SECRET` - Alias for NEXTAUTH_SECRET (some auth configs read this)
 
 ## Key File Locations & Responsibilities
 
