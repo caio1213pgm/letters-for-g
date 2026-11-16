@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Account" ALTER COLUMN "id_token" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Letter" ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
