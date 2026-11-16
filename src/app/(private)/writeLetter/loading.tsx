@@ -10,7 +10,7 @@ export default function loadingWriteLetter() {
     >
       <span className="sr-only">Abrindo o editor</span>
 
-      <div className="mx-auto flex min-w-2xl flex-col items-center gap-5 px-4 md:max-w-2xl">
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-4">
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <PenLine className="h-3 w-3 text-primary" />

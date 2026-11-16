@@ -37,7 +37,8 @@ export function Input({
           <Button
             type="button"
             variant="ghost"
-            className="hover:bg-transparent"
+            className="shrink-0 hover:bg-transparent"
+            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             onClick={() => setShowPassword(!showPassword)}
           >
             {!showPassword ? (

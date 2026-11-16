@@ -21,8 +21,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Letters-for-G",
-  description: "",
+  title: {
+    default: "Letters-for-G",
+    template: "%s · Letters-for-G",
+  },
+  description:
+    "Escreva uma carta, lacre com uma senha e envie o link para alguém especial.",
 };
 
 export default function RootLayout({
@@ -43,7 +47,12 @@ export default function RootLayout({
         instrumentSansHeading.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      {/* Extensões do navegador (Grammarly, ColorZilla, gerenciadores de senha)
+          injetam atributos no body antes do React hidratar. O aviso vale só
+          para este elemento, não para os filhos. */}
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

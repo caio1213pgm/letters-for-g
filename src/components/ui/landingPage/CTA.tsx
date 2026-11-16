@@ -23,14 +23,17 @@ export default function CTA() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
+                asChild
                 variant="secondary"
-                className="inline-flex items-center gap-2 rounded-full  p-6 text-sm font-medium text-foreground transition-transform"
+                className="inline-flex items-center gap-2 rounded-full p-6 text-sm font-medium text-foreground transition-transform"
               >
-                <Link href="/register">Criar conta grátis</Link>
-
-                <ArrowRight className="h-4 w-4" />
+                <Link href="/register">
+                  Criar conta grátis
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </Button>
               <Button
+                asChild
                 variant="ghost"
                 className="rounded-full border border-primary-foreground/30 p-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary hover:text-accent"
               >

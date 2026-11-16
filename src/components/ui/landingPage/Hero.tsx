@@ -43,9 +43,14 @@ export default function Hero() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button className="inline-flex items-center gap-2 rounded-full bg-primary p-5.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 ">
-                <Link href="/dashboard">Escrever minha primeira carta</Link>
-                <PenLine className="h-4 w-4" />
+              <Button
+                asChild
+                className="inline-flex items-center gap-2 rounded-full bg-primary p-5.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20"
+              >
+                <Link href="/writeLetter">
+                  Escrever minha primeira carta
+                  <PenLine className="h-4 w-4" />
+                </Link>
               </Button>
               <a
                 href="#como-funciona"
