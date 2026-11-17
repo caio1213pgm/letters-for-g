@@ -1,11 +1,26 @@
 import bcrypt from "bcryptjs";
-import { NextAuthConfig } from "next-auth";
+import { CredentialsSignin, NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getAuthSecret } from "./authSecret";
+import { getClientIp } from "./clientIp";
 import { prisma } from "./prisma";
+import { consumeRateLimit, resetRateLimit } from "./rateLimit";
+
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const MAX_LOGIN_ATTEMPTS_PER_EMAIL = 10;
+const MAX_LOGIN_ATTEMPTS_PER_IP = 30;
+
+export const RATE_LIMITED_CODE = "rate_limited";
+
+// Erro com código próprio para o formulário distinguir "bloqueado" de "senha errada"
+class RateLimitedSignin extends CredentialsSignin {
+  code = RATE_LIMITED_CODE;
+}
 
 const authOptions: NextAuthConfig = {
-  secret: getAuthSecret(),
+  // Lido aqui sem lançar erro: este módulo é carregado durante o `next build`
+  // (inclusive no Docker, onde o .env não existe). Sem segredo em runtime,
+  // o próprio Auth.js responde com MissingSecret.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -13,11 +28,26 @@ const authOptions: NextAuthConfig = {
         email: { label: "email", type: "text" },
         password: { label: "password", type: "text" },
       },
-      async authorize(credentials) {
+      // O limite fica no authorize, e não na server action, porque o endpoint
+      // /api/auth/callback/credentials também pode ser chamado diretamente
+      async authorize(credentials, request) {
         const email = credentials.email;
         const password = credentials.password;
         if (typeof email !== "string" || typeof password !== "string") {
           return null;
+        }
+
+        const emailKey = `login:email:${email.trim().toLowerCase()}`;
+        const ip = getClientIp(request.headers);
+        const [emailState, ipState] = await Promise.all([
+          consumeRateLimit(emailKey, LOGIN_WINDOW_MS),
+          ip ? consumeRateLimit(`login:ip:${ip}`, LOGIN_WINDOW_MS) : null,
+        ]);
+        if (
+          emailState.attempts > MAX_LOGIN_ATTEMPTS_PER_EMAIL ||
+          (ipState && ipState.attempts > MAX_LOGIN_ATTEMPTS_PER_IP)
+        ) {
+          throw new RateLimitedSignin();
         }
 
         const user = await prisma.user.findUnique({
@@ -33,6 +63,8 @@ const authOptions: NextAuthConfig = {
         );
 
         if (!isValidPassword) return null;
+
+        await resetRateLimit(emailKey);
 
         // Só o necessário vai para o JWT: nunca o hash da senha
         return { id: user.id, name: user.name, email: user.email };
