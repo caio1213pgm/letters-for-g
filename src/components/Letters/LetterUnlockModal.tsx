@@ -55,7 +55,7 @@ export default function LetterUnlockModal({
   const {
     register,
     handleSubmit,
-    reset,
+    setValue,
     formState: { errors },
   } = useForm<UnlockLetterSchemaType>({
     resolver: zodResolver(unlockLetterSchema),
@@ -86,7 +86,10 @@ export default function LetterUnlockModal({
         setIsBlocked(true);
         setServerError("Esta carta não está mais disponível.");
       }
-      reset({ password: "" });
+      // setValue, e não reset(): o reset desregistra o campo e, com o React Compiler
+      // memoizando o register, ele não volta a ser registrado. O formulário passava
+      // a enviar vazio em toda tentativa depois da primeira.
+      setValue("password", "");
     });
   };
 
