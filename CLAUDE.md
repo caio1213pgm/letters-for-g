@@ -70,7 +70,7 @@ app/
    - `src/actions/createLetter.ts` / `updateLetter.ts` / `deleteLetter.ts` - Author letter CRUD; write actions return `ActionResult` (`{ ok, data } | { ok: false, error }`) instead of throwing
    - `src/actions/checkLetterPassword.ts` - Author confirms the letter password before edit/delete (letters without a password skip it)
    - `src/actions/getLetters.ts` / `getLetterById.ts` - Author reads, always filtered by `authorId`
-   - `src/actions/getPublicLetter.ts` / `unlockLetter.ts` - Recipient flow: unlock with password, rate-limited per IP, access kept in an HMAC cookie (`src/lib/letterAccess.ts`)
+   - `src/actions/getPublicLetter.ts` / `unlockLetter.ts` - Recipient flow: unlock with password, rate-limited per IP and per letter (`RateLimit` table), access kept in an HMAC cookie (`src/lib/letterAccess.ts`)
    - Route protection lives in `src/proxy.ts` (Next.js proxy, formerly middleware)
 
 ## Common Commands
@@ -108,6 +108,7 @@ Required in `.env` (see `.env.example`):
 - `NEXTAUTH_URL` - Auth callback URL (http://localhost:3000 locally)
 - `AUTH_TRUST_HOST` - Set to `true` behind a proxy/Docker so Auth.js trusts the request host
 - `DATABASE_URL` - PostgreSQL connection string
+- `TRUSTED_PROXY_HOPS` - Optional (default `1`). Number of trusted proxies in front of the app; `src/lib/clientIp.ts` uses it to read the client IP for rate limiting (`src/lib/rateLimit.ts`). Use `0` when exposed directly.
 
 ## Key File Locations & Responsibilities
 

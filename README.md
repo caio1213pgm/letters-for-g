@@ -104,7 +104,7 @@ npx prisma studio                                  # Abre a interface visual do 
 - **User** — dados do usuário, com relação para credenciais, contas OAuth, sessões e cartas.
 - **Credential** — hash da senha do usuário (autenticação por credenciais).
 - **Letter** — carta escrita pelo usuário, com título, texto, destinatário, senha (hash), dica, status e contagem de leitores.
-- **LetterUnlockAttempt** — tentativas de senha por IP, para limitar força bruta na página pública.
+- **RateLimit** — contador de tentativas por chave, usado para limitar força bruta na senha da carta, no login e no cadastro.
 - **Account / Session / VerificationToken** — suporte a autenticação OAuth e gerenciamento de sessão (extensibilidade futura).
 
 ---
